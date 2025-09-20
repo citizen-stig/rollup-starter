@@ -18,6 +18,7 @@ license = "Sovereign Permissionless Commercial License"
 authors = ["Sovereign Labs <info@sovereign.xyz>"]
 publish = false
 rust-version = "1.88"
+repository = "https://github.com/citizen-stig/rollup-starter/"
 
 [workspace.dependencies]
 sov-address = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "349bdcd8b76067b6f120db06a66d518fd8f80f8a", features = [
