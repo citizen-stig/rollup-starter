@@ -41,6 +41,7 @@ sov-build = { workspace = true }
 default = []
 mock_da = ["sov-mock-da"]
 celestia_da = ["sov-celestia-adapter"]
+acceptance-testing = ["stf-starter-declaration/acceptance-testing"]
 native = [
 	"stf-starter-declaration/native",
 	"sov-modules-api/native",
@@ -57,7 +58,8 @@ native = [
 	"sov-mock-da?/native",
 	"sov-celestia-adapter?/native",
 	"sov-mock-zkvm/native",
-	"sov-evm/native"
+	"sov-evm/native",
+	"sov-test-state-consistency/native"
 ]
 
 bench = [

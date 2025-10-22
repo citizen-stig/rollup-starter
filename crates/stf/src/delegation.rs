@@ -85,6 +85,7 @@ where
     }
 }
 
+#[cfg(feature = "acceptance-testing")]
 impl<S: Spec> EncodeCall<sov_test_state_consistency::StateConsistency<S>> for Runtime<S>
 where
     <S as Spec>::Address: HyperlaneAddress + FromVmAddress<EthereumAddress>,

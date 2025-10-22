@@ -44,6 +44,7 @@ clap = { workspace = true, features = ["derive"], optional = true }
 
 [features]
 default = []
+acceptance-testing = []
 native = [
 	"clap",
 	"jsonrpsee",
@@ -70,7 +71,8 @@ native = [
 	"sov-operator-incentives/native",
 	"sov-revenue-share/native",
 	"sov-address/native",
-	"sov-evm/native"
+	"sov-evm/native",
+	"sov-test-state-consistency/native"
 ]
 bench = [
     "sov-modules-api/bench",
