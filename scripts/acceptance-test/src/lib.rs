@@ -214,7 +214,6 @@ async fn worker_task(
         .await
 }
 
-
 fn start_workers(
     salt: u32,
 ) -> Result<

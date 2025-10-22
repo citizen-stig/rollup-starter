@@ -22,6 +22,10 @@ test-data/docker
 scripts/rollup-starter.sh
 scripts/rollup-starter-celestia.sh
 
+<<<<<<< HEAD
 # Acceptance test data isn't committed to git
+=======
+# Acceptance test data isn't stored in git
+>>>>>>> 019e4a92fca6df8b4cb263dbc6f2e241cdb478d3
 scripts/acceptance-test/acceptance-test-data*
 scripts/acceptance-test/accepted_throughput_report.json
