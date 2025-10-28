@@ -1,7 +1,12 @@
 use super::{Runtime, Spec, API_URL};
+use futures::stream::BoxStream;
+use futures::FutureExt;
+use serde::de::DeserializeOwned;
+use sov_api_spec::types::Slot;
 use sov_modules_api::capabilities::config_chain_id;
 use sov_modules_api::transaction::{Transaction, TxDetails};
 use sov_modules_api::{DispatchCall, PrivateKey, Runtime as RuntimeTrait};
+use sov_rollup_interface::node::ledger_api::IncludeChildren;
 use sov_test_utils::{TransactionType, TEST_DEFAULT_MAX_FEE, TEST_DEFAULT_MAX_PRIORITY_FEE};
 use std::collections::HashMap;
 use tokio::sync::watch;
@@ -17,171 +22,101 @@ struct ValueResponse<T> {
     value: T,
 }
 
-pub async fn state_validation_worker(
-    client: sov_api_spec::Client,
-    rx: watch::Receiver<bool>,
-) -> anyhow::Result<()> {
-    use futures::FutureExt;
-    use sov_rollup_interface::node::ledger_api::IncludeChildren;
+fn drain_slot_stream(
+    slot_stream: &mut BoxStream<'static, anyhow::Result<Slot>>,
+    mut latest_slot: Slot,
+) -> Slot {
+    tracing::info!(
+        "State validation: got new slot notification, number = {}",
+        latest_slot.number
+    );
 
-    // Subscribe to slots
-    let mut slot_stream = client
-        .subscribe_slots_with_children(IncludeChildren::new(false))
-        .await?;
-
-    tracing::info!("State validation worker started");
-
-    while !*rx.borrow() {
-        // Wait for next slot notification (blocking)
-        let mut latest_slot = match slot_stream.next().await {
-            Some(Ok(slot)) => slot,
-            Some(Err(e)) => {
-                tracing::error!("Error receiving slot: {}", e);
-                continue;
-            }
-            None => break,
-        };
-        tracing::info!(
-            "State validation: got new slot notification, number = {}",
-            latest_slot.number
-        );
-
-        // Check if there are any additional slots already queued (non-blocking)
-        // If so, we're falling behind and should fail
-        let mut drained_count = 0;
-        while let Some(Some(Ok(slot))) = slot_stream.next().now_or_never() {
-            latest_slot = slot;
-            drained_count += 1;
-        }
-
-        if drained_count > 0 {
-            tracing::warn!(
-                "State validation worker drained {} slots - slots are being produced faster than we can process them! Those slots will have skipped kernel state validation.",
-                drained_count
-            );
-        }
-
-        // Query the state values from the module
-        let visible_slot_url = format!(
-            "{}/modules/state-consistency/state/latest-visible-slot-number/",
-            API_URL
-        );
-        let state_root_url = format!(
-            "{}/modules/state-consistency/state/latest-state-root/",
-            API_URL
-        );
-        let rollup_height_url = format!(
-            "{}/modules/state-consistency/state/latest-rollup-height/",
-            API_URL
-        );
-
-        // First, poll only visible_slot until the API state catches up (to handle race condition
-        // between slot notification and checkpoint update)
-        let visible_slot = {
-            let max_attempts = 300; // 300 * 10ms = 3s = one full slot at the default config
-            let mut attempt = 0;
-
-            loop {
-                let visible_slot: ValueResponse<u64> = client
-                    .client()
-                    .get(&visible_slot_url)
-                    .send()
-                    .await?
-                    .json()
-                    .await?;
-
-                // Check if the API state has caught up to the slot notification
-                if visible_slot.value == latest_slot.number {
-                    tracing::debug!(
-                        "State consistency: waited {} ms for API state to be updated...",
-                        attempt * 10
-                    );
-                    break visible_slot;
-                }
-
-                attempt += 1;
-                if attempt >= max_attempts {
-                    tracing::error!(
-                        "State validation worker timed out waiting for API state to update. Slot notification: {}, API visible_slot: {}. This is either an error in the sequencer, or the acceptance test has a bug.",
-                        latest_slot.number,
-                        visible_slot.value
-                    );
-                }
-
-                tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-            }
-        };
-
-        // Once the visible_slot has caught up, we can query the other two values
-        let (state_root_result, rollup_height_result) = tokio::join!(
-            async {
-                client
-                    .client()
-                    .get(&state_root_url)
-                    .send()
-                    .await?
-                    .json::<ValueResponse<StateRootResponse>>()
-                    .await
-            },
-            async {
-                client
-                    .client()
-                    .get(&rollup_height_url)
-                    .send()
-                    .await?
-                    .json::<ValueResponse<u64>>()
-                    .await
-            }
-        );
-        let state_root = state_root_result?;
-        let rollup_height = rollup_height_result?;
-
-        tracing::info!(
-            "State validation: slot_notification={}, module_visible_slot={}, module_rollup_height={}, state_root={}",
-            latest_slot.number,
-            visible_slot.value,
-            rollup_height.value,
-            hex::encode(&state_root.value.root_hashes)
-        );
-
-        // Now we can submit the assertion transaction
-        let assert_tx = create_assert_block_state_tx(
-            visible_slot.value,
-            rollup_height.value,
-            state_root.value.root_hashes,
-        )?;
-
-        if let Err(e) = client.send_tx_to_sequencer(&assert_tx).await {
-            if e.to_string()
-                .contains("The preferred sequencer has reached the stop height")
-            {
-                tracing::info!(
-                    "State validation worker detected sequencer stop height, shutting down"
-                );
-                return Ok(());
-            }
-
-            // Check if this is a "too late" error (actual rollup height > expected)
-            if is_too_late_error(&e, rollup_height.value) {
-                tracing::warn!(
-                    "State assertion tx for slot {} height {} was rejected because the rollup already advanced past it. This can happen, but the kernel assertions have been skipped for this slot as a result.",
-                    visible_slot.value,
-                    rollup_height.value,
-                );
-                continue;
-            }
-
-            anyhow::bail!(
-                "Failed to submit state assertion tx for slot {} height {}: {}",
-                visible_slot.value,
-                rollup_height.value,
-                e
-            );
-        }
+    // Check if there are any additional slots already queued (non-blocking)
+    // If so, we're falling behind and should fail
+    let mut drained_count = 0;
+    while let Some(Some(Ok(slot))) = slot_stream.next().now_or_never() {
+        latest_slot = slot;
+        drained_count += 1;
     }
 
-    tracing::info!("State validation worker shutting down");
-    Ok(())
+    if drained_count > 0 {
+        tracing::warn!(
+            "State validation worker drained {} slots - slots are being produced faster than we can process them! Those slots will have some validation checks skipped.",
+            drained_count
+        );
+    }
+
+    latest_slot
+}
+
+async fn query_state_value<T: DeserializeOwned>(
+    client: &sov_api_spec::Client,
+    url: &str,
+) -> reqwest::Result<T> {
+    client
+        .client()
+        .get(url)
+        .send()
+        .await?
+        .json::<ValueResponse<T>>()
+        .await
+        .map(|resp| resp.value)
+}
+
+async fn query_visible_slot(client: &sov_api_spec::Client) -> reqwest::Result<u64> {
+    let visible_slot_url = format!(
+        "{}/modules/state-consistency/state/latest-visible-slot-number/",
+        API_URL
+    );
+    query_state_value::<u64>(&client, &visible_slot_url).await
+}
+
+async fn query_state_root(client: &sov_api_spec::Client) -> reqwest::Result<StateRootResponse> {
+    let state_root_url = format!(
+        "{}/modules/state-consistency/state/latest-state-root/",
+        API_URL
+    );
+    query_state_value::<StateRootResponse>(&client, &state_root_url).await
+}
+
+async fn query_rollup_height(client: &sov_api_spec::Client) -> reqwest::Result<u64> {
+    let rollup_height_url = format!(
+        "{}/modules/state-consistency/state/latest-rollup-height/",
+        API_URL
+    );
+    query_state_value::<u64>(&client, &rollup_height_url).await
+}
+
+async fn poll_for_api_state_update(
+    client: &sov_api_spec::Client,
+    target_slot_number: u64,
+) -> anyhow::Result<()> {
+    let max_attempts = 300; // 300 * 10ms = 3s = one full slot at the default config
+    let mut attempt = 0;
+
+    loop {
+        let visible_slot = query_visible_slot(&client).await?;
+
+        // Check if the API state has caught up to the slot notification
+        if visible_slot == target_slot_number {
+            tracing::debug!(
+                "State consistency: waited {} ms for API state to be updated...",
+                attempt * 10
+            );
+            return Ok(());
+        }
+
+        attempt += 1;
+        if attempt >= max_attempts {
+            anyhow::bail!(
+                "State validation worker timed out waiting for API state to update. Slot notification: {}, API visible_slot: {}. This is either an error in the sequencer, or the acceptance test has a bug.",
+                target_slot_number,
+                visible_slot
+            );
+        }
+
+        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+    }
 }
 
 fn create_assert_block_state_tx(
@@ -213,6 +148,41 @@ fn create_assert_block_state_tx(
         },
         &mut HashMap::from([(key.pub_key(), 0)]),
     ))
+}
+
+async fn send_assert_block_tx(
+    client: &sov_api_spec::Client,
+    visible_slot: u64,
+    rollup_height: u64,
+    state_root: Vec<u8>,
+) -> anyhow::Result<()> {
+    let assert_tx = create_assert_block_state_tx(visible_slot, rollup_height, state_root)?;
+
+    match client.send_tx_to_sequencer(&assert_tx).await {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            if e.to_string()
+                .contains("The preferred sequencer has reached the stop height")
+            {
+                tracing::info!(
+                    "State validation worker detected sequencer stop height, shutting down"
+                );
+                return Ok(());
+            }
+
+            // Check if this is a "too late" error (actual rollup height > expected)
+            if is_too_late_error(&e, rollup_height) {
+                tracing::warn!(
+                    "State assertion tx for slot {visible_slot} height {rollup_height} was rejected because the rollup already advanced past it. This can happen, but the kernel assertions have been skipped for this slot as a result."
+                );
+                return Ok(());
+            }
+
+            anyhow::bail!(
+                "Failed to submit state assertion tx for slot {visible_slot} height {rollup_height}: {e}",
+            );
+        }
+    }
 }
 
 /// Check if the error is a "too late" error, meaning the transaction was rejected
@@ -257,6 +227,52 @@ fn extract_rollup_height_from_error(error_str: &str) -> Option<u64> {
     let height_str = remaining.split(|c: char| !c.is_ascii_digit()).next()?;
 
     height_str.parse::<u64>().ok()
+}
+
+pub async fn state_validation_worker(
+    client: sov_api_spec::Client,
+    rx: watch::Receiver<bool>,
+) -> anyhow::Result<()> {
+    // Subscribe to slots
+    let mut slot_stream = client
+        .subscribe_slots_with_children(IncludeChildren::new(false))
+        .await?;
+
+    tracing::info!("State validation worker started");
+
+    while !*rx.borrow() {
+        let latest_slot = match slot_stream.next().await {
+            Some(Ok(slot)) => slot,
+            Some(Err(e)) => {
+                tracing::error!("Error receiving slot: {}", e);
+                continue;
+            }
+            None => break,
+        };
+        let latest_slot = drain_slot_stream(&mut slot_stream, latest_slot);
+
+        // There's a race condition between slot notification and checkpoint update, so poll until
+        // they match
+        poll_for_api_state_update(&client, latest_slot.number).await?;
+        let visible_slot = latest_slot.number;
+
+        let (state_root_result, rollup_height_result) =
+            tokio::join!(async { query_state_root(&client).await }, async {
+                query_rollup_height(&client).await
+            });
+        let state_root = state_root_result?;
+        let rollup_height = rollup_height_result?;
+        tracing::debug!(
+            "Visible_slot: {visible_slot}, rollup_height: {rollup_height}, state_root: {}",
+            hex::encode(&state_root.root_hashes)
+        );
+
+        // Now we can submit the assertion transaction
+        send_assert_block_tx(&client, visible_slot, rollup_height, state_root.root_hashes).await?;
+    }
+
+    tracing::info!("State validation worker shutting down");
+    Ok(())
 }
 
 #[cfg(test)]
