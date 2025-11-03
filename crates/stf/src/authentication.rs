@@ -1,13 +1,20 @@
 use std::marker::PhantomData;
 
+use alloy_consensus::{transaction::SignerRecoverable, Transaction};
 use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
 use sov_modules_api::capabilities::{
+<<<<<<< HEAD
     self, authentication, AuthorizationData, BatchFromUnregisteredSequencer, FatalError,
     TransactionAuthenticator, UnregisteredAuthenticationError,
+=======
+    self, AuthorizationData, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
+    UniquenessData, UnregisteredAuthenticationError,
+>>>>>>> d54e07d (Hack together decode_serialized_tx update to authenticator)
 };
 use sov_modules_api::runtime::capabilities::AuthenticationError;
+use sov_modules_api::transaction::Credentials;
 use sov_modules_api::{
     DispatchCall, FullyBakedTx, GetGasPrice, ProvableStateReader, RawTx, Runtime, Spec,
 };
@@ -123,13 +130,27 @@ where
 
         match &auth_variant {
             EvmAndEip712AuthenticatorInput::Evm(raw_tx) => {
-                let (call, auth_data) =
-                    sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
-                        S,
-                        Rt,
-                        <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
-                    >(&raw_tx.data)?;
-                Ok((EvmAndEip712AuthenticatorInput::Evm(call), auth_data))
+                let (call, tx) = sov_evm::decode_evm_tx(&raw_tx.data)?;
+                let signer = tx.recover_signer().map_err(|e| {
+                    sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
+                })?;
+                let ethereum_address: EthereumAddress = signer.into();
+                let credentials = Credentials::new(signer);
+                let credential_id = ethereum_address.as_credential_id();
+                let tx_hash = TxHash::new(**tx.hash());
+
+                let auth_data = AuthorizationData {
+                    uniqueness: UniquenessData::Nonce(tx.nonce()),
+                    tx_hash,
+                    credential_id,
+                    credentials,
+                    default_address: S::Address::from_vm_address(ethereum_address),
+                };
+
+                Ok((
+                    EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage { rlp: call }),
+                    auth_data,
+                ))
             }
             EvmAndEip712AuthenticatorInput::Standard(raw_tx) => {
                 let (call, auth_data) = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;

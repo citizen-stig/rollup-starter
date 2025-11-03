@@ -72,6 +72,7 @@ stf-starter-declaration = { path = "./crates/stf/stf-declaration", default-featu
 value-setter = { path = "./examples/value-setter" }
 strum = { version = "0.26.3", features = ["derive"] }
 
+alloy-consensus = { version = "1.0.37", default-features = false }
 axum = { version = "0.7.9", default-features = false }
 serde = { version = "1.0.192", features = ["derive", "rc"] }
 serde_json = { version = "1.0" }

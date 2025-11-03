@@ -27,6 +27,7 @@ sov-evm = { workspace = true }
 sov-eip712-auth = { workspace = true }
 
 anyhow = { workspace = true }
+alloy-consensus = { workspace = true }
 borsh = { workspace = true }
 
 [build-dependencies]
@@ -62,12 +63,14 @@ native = [
 	"sov-celestia-adapter?/native",
 	"sov-mock-zkvm/native",
 	"sov-evm/native",
-	"sov-eip712-auth/native"
+	"sov-eip712-auth/native",
+	"sov-state/native"
 ]
 
 bench = [
-  "stf-starter-declaration/bench",
-  "sov-modules-api/bench",
-  "sov-modules-stf-blueprint/bench",
-  "sov-celestia-adapter?/bench",
+	"stf-starter-declaration/bench",
+	"sov-modules-api/bench",
+	"sov-modules-stf-blueprint/bench",
+	"sov-celestia-adapter?/bench",
+	"sov-state/bench"
 ]
