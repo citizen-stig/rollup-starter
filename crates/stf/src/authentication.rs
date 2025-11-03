@@ -4,8 +4,8 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
 use sov_modules_api::capabilities::{
-    self, AuthorizationData, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
-    UnregisteredAuthenticationError,
+    self, authentication, AuthorizationData, BatchFromUnregisteredSequencer, FatalError,
+    TransactionAuthenticator, UnregisteredAuthenticationError,
 };
 use sov_modules_api::runtime::capabilities::AuthenticationError;
 use sov_modules_api::{
@@ -129,11 +129,7 @@ where
                         Rt,
                         <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
                     >(&raw_tx.data)?;
-
-                Ok((
-                    EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage { rlp: call }),
-                    auth_data,
-                ))
+                Ok((EvmAndEip712AuthenticatorInput::Evm(call), auth_data))
             }
             EvmAndEip712AuthenticatorInput::Standard(raw_tx) => {
                 let (call, auth_data) = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;
