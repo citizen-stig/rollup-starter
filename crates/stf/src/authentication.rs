@@ -4,7 +4,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
 use sov_modules_api::capabilities::{
-    self, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
+    self, AuthorizationData, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
     UnregisteredAuthenticationError,
 };
 use sov_modules_api::runtime::capabilities::AuthenticationError;
@@ -41,37 +41,6 @@ where
     type Decodable =
         EvmAndEip712AuthenticatorInput<sov_evm::CallMessage, <Rt as DispatchCall>::Decodable>;
     type Input = EvmAndEip712AuthenticatorInput;
-
-    #[cfg(feature = "native")]
-    fn decode_serialized_tx(
-        tx: &FullyBakedTx,
-    ) -> Result<Self::Decodable, sov_modules_api::capabilities::FatalError> {
-        let auth_variant: EvmAndEip712AuthenticatorInput =
-            borsh::from_slice(&tx.data).map_err(|e| {
-                sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
-            })?;
-
-        match auth_variant {
-            EvmAndEip712AuthenticatorInput::Evm(raw_tx) => {
-                let (call, _tx) = sov_evm::decode_evm_tx(&raw_tx.data)?;
-                Ok(EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage {
-                    rlp: call,
-                }))
-            }
-            EvmAndEip712AuthenticatorInput::Standard(raw_tx) => {
-                let call = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;
-                Ok(EvmAndEip712AuthenticatorInput::Standard(call))
-            }
-            EvmAndEip712AuthenticatorInput::Eip712(raw_tx) => {
-                let call = sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
-                    S,
-                    Rt,
-                    <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
-                >(&raw_tx.data)?;
-                Ok(EvmAndEip712AuthenticatorInput::Eip712(call))
-            }
-        }
-    }
 
     fn authenticate<Accessor: ProvableStateReader<User, Spec = S> + GetGasPrice<Spec = S>>(
         tx: &FullyBakedTx,
@@ -138,6 +107,46 @@ where
             EvmAndEip712AuthenticatorInput::Eip712(tx)
             | EvmAndEip712AuthenticatorInput::Standard(tx) => {
                 Ok(capabilities::calculate_hash::<S>(&tx.data))
+            }
+        }
+    }
+
+    #[cfg(feature = "native")]
+    fn decode_serialized_tx(
+        tx: &FullyBakedTx,
+    ) -> Result<(Self::Decodable, AuthorizationData<S>), sov_modules_api::capabilities::FatalError>
+    {
+        let auth_variant: EvmAndEip712AuthenticatorInput =
+            borsh::from_slice(&tx.data).map_err(|e| {
+                sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
+            })?;
+
+        match &auth_variant {
+            EvmAndEip712AuthenticatorInput::Evm(raw_tx) => {
+                let (call, auth_data) =
+                    sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
+                        S,
+                        Rt,
+                        <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
+                    >(&raw_tx.data)?;
+
+                Ok((
+                    EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage { rlp: call }),
+                    auth_data,
+                ))
+            }
+            EvmAndEip712AuthenticatorInput::Standard(raw_tx) => {
+                let (call, auth_data) = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;
+                Ok((EvmAndEip712AuthenticatorInput::Standard(call), auth_data))
+            }
+            EvmAndEip712AuthenticatorInput::Eip712(raw_tx) => {
+                let (call, auth_data) =
+                    sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
+                        S,
+                        Rt,
+                        <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
+                    >(&raw_tx.data)?;
+                Ok((EvmAndEip712AuthenticatorInput::Eip712(call), auth_data))
             }
         }
     }

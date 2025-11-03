@@ -37,6 +37,8 @@ impl<S: Spec> Module for ValueSetter<S> {
     type CallMessage = CallMessage;
 
     type Event = ();
+    
+    type Error = anyhow::Error;
 
     fn call(
         &mut self,
