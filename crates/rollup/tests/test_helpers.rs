@@ -60,6 +60,7 @@ pub async fn start_rollup(
             blob_processing_timeout_secs: 60,
             extension: Some(SeqConfigExtension {
                 max_log_limit: 20000,
+                response_size_limit: (1024 * 1024) - (1024 * 30) // Limit our response size to 1MB, leaving 30kb for headers, overhead, and misestimation.
             }),
             sequencer_kind_config: SequencerKindConfig::Preferred(PreferredSequencerConfig {
                 recovery_strategy: RecoveryStrategy::None,
