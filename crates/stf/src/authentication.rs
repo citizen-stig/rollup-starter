@@ -1,5 +1,4 @@
 #[cfg(feature = "native")]
-use alloy_consensus::{transaction::SignerRecoverable, Transaction};
 use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
@@ -8,7 +7,6 @@ use sov_modules_api::capabilities::{
     UnregisteredAuthenticationError,
 };
 #[cfg(feature = "native")]
-use sov_modules_api::capabilities::{AuthorizationData, UniquenessData};
 use sov_modules_api::runtime::capabilities::AuthenticationError;
 use sov_modules_api::{
     DispatchCall, FullyBakedTx, GetGasPrice, ProvableStateReader, RawTx, Runtime, Spec,
@@ -116,8 +114,7 @@ where
     #[cfg(feature = "native")]
     fn decode_serialized_tx(
         tx: &FullyBakedTx,
-    ) -> Result<(Self::Decodable, AuthorizationData<S>), sov_modules_api::capabilities::FatalError>
-    {
+    ) -> Result<Self::Decodable, sov_modules_api::capabilities::FatalError> {
         let auth_variant: EvmAndEip712AuthenticatorInput =
             borsh::from_slice(&tx.data).map_err(|e| {
                 sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
@@ -125,40 +122,22 @@ where
 
         match &auth_variant {
             EvmAndEip712AuthenticatorInput::Evm(raw_tx) => {
-                let (call, tx) = sov_evm::decode_evm_tx(&raw_tx.data)?;
-                let signer = tx.recover_signer().map_err(|e| {
-                    sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
-                })?;
-                let ethereum_address: EthereumAddress = signer.into();
-                let credentials = sov_modules_api::transaction::Credentials::new(signer);
-                let credential_id = ethereum_address.as_credential_id();
-                let tx_hash = sov_rollup_interface::TxHash::new(**tx.hash());
-
-                let auth_data = AuthorizationData {
-                    uniqueness: UniquenessData::Nonce(tx.nonce()),
-                    tx_hash,
-                    credential_id,
-                    credentials,
-                    default_address: S::Address::from_vm_address(ethereum_address),
-                };
-
-                Ok((
-                    EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage { rlp: call }),
-                    auth_data,
-                ))
+                let (call, _tx) = sov_evm::decode_evm_tx(&raw_tx.data)?;
+                Ok(EvmAndEip712AuthenticatorInput::Evm(sov_evm::CallMessage {
+                    rlp: call,
+                }))
             }
             EvmAndEip712AuthenticatorInput::Standard(raw_tx) => {
-                let (call, auth_data) = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;
-                Ok((EvmAndEip712AuthenticatorInput::Standard(call), auth_data))
+                let call = capabilities::decode_sov_tx::<S, Rt>(&raw_tx.data)?;
+                Ok(EvmAndEip712AuthenticatorInput::Standard(call))
             }
             EvmAndEip712AuthenticatorInput::Eip712(raw_tx) => {
-                let (call, auth_data) =
-                    sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
-                        S,
-                        Rt,
-                        <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
-                    >(&raw_tx.data)?;
-                Ok((EvmAndEip712AuthenticatorInput::Eip712(call), auth_data))
+                let call = sov_modules_api::capabilities::decode_sov_tx_with_cryptospec::<
+                    S,
+                    Rt,
+                    <<S as Spec>::CryptoSpec as Secp256k1CryptoSpec>::CryptoSpec,
+                >(&raw_tx.data)?;
+                Ok(EvmAndEip712AuthenticatorInput::Eip712(call))
             }
         }
     }
