@@ -5,7 +5,6 @@ use sov_modules_api::capabilities::{
     self, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
     UnregisteredAuthenticationError,
 };
-#[cfg(feature = "native")]
 use sov_modules_api::runtime::capabilities::AuthenticationError;
 use sov_modules_api::{
     DispatchCall, FullyBakedTx, GetGasPrice, ProvableStateReader, RawTx, Runtime, Spec,
