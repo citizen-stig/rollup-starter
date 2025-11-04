@@ -1,4 +1,3 @@
-#[cfg(feature = "native")]
 use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
