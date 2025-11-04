@@ -1,25 +1,20 @@
-use std::marker::PhantomData;
-
+#[cfg(feature = "native")]
 use alloy_consensus::{transaction::SignerRecoverable, Transaction};
 use borsh::{BorshDeserialize, BorshSerialize};
 use sov_address::{EthereumAddress, FromVmAddress};
 use sov_eip712_auth::{SchemaProvider, Secp256k1CryptoSpec};
 use sov_modules_api::capabilities::{
-<<<<<<< HEAD
-    self, authentication, AuthorizationData, BatchFromUnregisteredSequencer, FatalError,
-    TransactionAuthenticator, UnregisteredAuthenticationError,
-=======
-    self, AuthorizationData, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
-    UniquenessData, UnregisteredAuthenticationError,
->>>>>>> d54e07d (Hack together decode_serialized_tx update to authenticator)
+    self, BatchFromUnregisteredSequencer, FatalError, TransactionAuthenticator,
+    UnregisteredAuthenticationError,
 };
+#[cfg(feature = "native")]
+use sov_modules_api::capabilities::{AuthorizationData, UniquenessData};
 use sov_modules_api::runtime::capabilities::AuthenticationError;
-use sov_modules_api::transaction::Credentials;
 use sov_modules_api::{
     DispatchCall, FullyBakedTx, GetGasPrice, ProvableStateReader, RawTx, Runtime, Spec,
 };
-use sov_rollup_interface::TxHash;
 use sov_state::User;
+use std::marker::PhantomData;
 
 /// See [`TransactionAuthenticator::Input`].
 #[derive(std::fmt::Debug, Clone, BorshDeserialize, BorshSerialize)]
@@ -109,7 +104,7 @@ where
         match input {
             EvmAndEip712AuthenticatorInput::Evm(tx) => {
                 let (_rlp, tx) = sov_evm::decode_evm_tx(&tx.data)?;
-                Ok(TxHash::new(**tx.hash()))
+                Ok(sov_rollup_interface::TxHash::new(**tx.hash()))
             }
             EvmAndEip712AuthenticatorInput::Eip712(tx)
             | EvmAndEip712AuthenticatorInput::Standard(tx) => {
@@ -135,9 +130,9 @@ where
                     sov_modules_api::capabilities::FatalError::DeserializationFailed(e.to_string())
                 })?;
                 let ethereum_address: EthereumAddress = signer.into();
-                let credentials = Credentials::new(signer);
+                let credentials = sov_modules_api::transaction::Credentials::new(signer);
                 let credential_id = ethereum_address.as_credential_id();
-                let tx_hash = TxHash::new(**tx.hash());
+                let tx_hash = sov_rollup_interface::TxHash::new(**tx.hash());
 
                 let auth_data = AuthorizationData {
                     uniqueness: UniquenessData::Nonce(tx.nonce()),
