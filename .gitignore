@@ -27,3 +27,5 @@ scripts/rollup-starter-celestia.sh
 # Acceptance test data isn't stored in git
 scripts/acceptance-test/acceptance-test-data*
 scripts/acceptance-test/accepted_throughput_report.json
+
+**/rustc-ice-*.txt
