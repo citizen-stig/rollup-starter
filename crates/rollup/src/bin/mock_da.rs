@@ -23,7 +23,7 @@ struct Cli {
     db: String,
 
     /// Block time in milliseconds for periodic block production
-    #[arg(long, default_value = "6000")]
+    #[arg(long, default_value = "1000")]
     block_time_ms: u64,
 }
 
