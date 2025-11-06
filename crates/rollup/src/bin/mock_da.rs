@@ -5,6 +5,7 @@ use sov_mock_da::storable::rpc::start_server;
 use sov_mock_da::storable::StorableMockDaService;
 use sov_mock_da::{MockAddress, MockDaConfig};
 
+// Run with cargo run --bin mock-da-server --no-default-features --features="mock_da_external,mock_zkvm"
 #[derive(Parser, Debug)]
 #[command(name = "mock-da-server")]
 #[command(about = "Mock DA server for testing purposes", long_about = None)]
