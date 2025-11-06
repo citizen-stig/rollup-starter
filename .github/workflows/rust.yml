@@ -66,17 +66,18 @@ jobs:
         ./scripts/rollup-starter.sh
     secrets: inherit
 
-  run-readme:
+  run-readme-external-mock-da:
+    needs: run-readme
     if: github.repository == 'Sovereign-Labs/rollup-starter'
     uses: ./.github/workflows/reusable-job.yml
     with:
-      job-name: "Run READEME_EXTERNAL_MOCK_DA"
+      job-name: "Run README_EXTERNAL_MOCK_DA"
       env-vars: "SKIP_GUEST_BUILD=1"
       runner-size: "16x64"
       command: |
-        bashtestmd --input READEME_EXTERNAL_MOCK_DA.md --output scripts/rollup-starter.sh --tag=test-ci
-        chmod +x scripts/rollup-starter.sh
-        ./scripts/rollup-starter.sh
+        bashtestmd --input README_EXTERNAL_MOCK_DA.md --output scripts/rollup-starter-external-da.sh --tag=test-ci
+        chmod +x scripts/rollup-starter-external-da.sh
+        ./scripts/rollup-starter-external-da.sh
     secrets: inherit
 
   docker-mock-da:
