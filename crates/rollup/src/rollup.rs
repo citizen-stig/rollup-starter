@@ -152,6 +152,7 @@ impl FullNodeBlueprint<Native> for StarterRollup<Native> {
         &self,
         sequencer: Arc<Seq>,
         _rollup_config: &RollupConfig<<Self::Spec as Spec>::Address, Self::DaService>,
+        shutdown_receiver: tokio::sync::watch::Receiver<()>,
     ) -> anyhow::Result<NodeEndpoints>
     where
         Seq: Sequencer<Spec = Self::Spec, Rt = Self::Runtime, Da = Self::DaService>,
@@ -162,6 +163,7 @@ impl FullNodeBlueprint<Native> for StarterRollup<Native> {
                 response_size_limit: (1024 * 1024) - (1024 * 30), // Limit our response size to 1MB, leaving 30kb for headers, overhead, and misestimation.
             },
             buffer_raw_txs: true,
+            shutdown_receiver,
         };
 
         let axum_router = axum::Router::new()
