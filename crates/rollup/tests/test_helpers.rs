@@ -1,6 +1,6 @@
 use sov_cli::wallet_state::PrivateKeyAndAddress;
 use std::net::SocketAddr;
-use std::num::{NonZeroU64, NonZeroUsize};
+use std::num::{NonZero, NonZeroU64, NonZeroUsize};
 use std::path::Path;
 
 use rollup_starter::rollup::StarterRollup;
@@ -36,8 +36,9 @@ pub async fn start_rollup(
         runner: RunnerConfig {
             da_polling_interval_ms: 200,
             http_config: HttpServerConfig::localhost_on_free_port(),
-            concurrent_sync_tasks: Some(1),
+            concurrent_sync_tasks: 1,
             save_tx_bodies: false,
+            pre_fetched_blocks_capacity: NonZero::new(3).unwrap(),
             da_total_timeout_secs: 3_600,
         },
         da: da_config,
