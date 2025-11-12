@@ -116,6 +116,7 @@
   "value_setter": null,
   "evm": {
     "accounts": [],
+    "contract_creation_policy": "everyone",
     "initial_base_fee": 7,
     "genesis_timestamp": 0,
     "chain_spec": {
