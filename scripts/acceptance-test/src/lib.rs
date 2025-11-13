@@ -259,12 +259,7 @@ pub struct ThroughputReport {
 
 pub fn build_rollup(root_dir: PathBuf) -> anyhow::Result<()> {
     let build_status = Command::new("cargo")
-        .args([
-            "build",
-            "--release",
-            "--features",
-            "acceptance-testing",
-        ])
+        .args(["build", "--release", "--features", "acceptance-testing"])
         .current_dir(root_dir)
         .status()
         .expect("Failed to execute cargo build");
@@ -272,7 +267,10 @@ pub fn build_rollup(root_dir: PathBuf) -> anyhow::Result<()> {
     if build_status.success() {
         Ok(())
     } else {
-        Err(anyhow::anyhow!("Failed to build rollup with exit code: {:?}", build_status.code()))
+        Err(anyhow::anyhow!(
+            "Failed to build rollup with exit code: {:?}",
+            build_status.code()
+        ))
     }
 }
 

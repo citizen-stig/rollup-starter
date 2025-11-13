@@ -107,6 +107,8 @@ async fn run_test() -> Result<(), anyhow::Error> {
         .args([
             "run",
             "--release",
+            "--features",
+            "acceptance-testing",
             "--",
             "--rollup-config-path",
             &directories

@@ -2,7 +2,9 @@ use std::process::Command;
 
 use acceptance_test::fetch_and_compare::{GetItemBehavior, SlotFetcher};
 use acceptance_test::{
-    build_rollup, cleanup_postgres_container, generate_postgres_password, get_rollup_client, interpolate_config, run_soak, start_and_wait_for_postgres_ready, wait_for_sequencer_ready, Directories, Runtime, Spec, API_URL, NUM_SOAK_BATCHES, POSTGRES_CONTAINER_NAME
+    build_rollup, cleanup_postgres_container, generate_postgres_password, get_rollup_client,
+    interpolate_config, run_soak, start_and_wait_for_postgres_ready, wait_for_sequencer_ready,
+    Directories, Runtime, Spec, API_URL, NUM_SOAK_BATCHES, POSTGRES_CONTAINER_NAME,
 };
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;

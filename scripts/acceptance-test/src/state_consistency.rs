@@ -53,7 +53,7 @@ async fn drain_slot_stream(
         }
     };
 
-    tracing::info!(
+    tracing::trace!(
         "State validation: got new slot notification, number = {}",
         latest_slot.number
     );
