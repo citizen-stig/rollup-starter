@@ -1,5 +1,5 @@
 use acceptance_test::fetch_and_compare::SlotFetcher;
-use acceptance_test::{build_rollup, ThroughputReport};
+use acceptance_test::{build_rollup, wait_for_sequencer_ready, ThroughputReport};
 use acceptance_test::{
     cleanup_postgres_container,
     fetch_and_compare::{compare_against_snapshot, load_snapshot_json},
@@ -190,6 +190,9 @@ async fn run_test() -> Result<(), anyhow::Error> {
         "Rollup resync complete. All slots match their snapshots. Found {} batches.",
         latest_batch_num
     );
+
+    // Wait for the sequencer to resync to the empty DA slots
+    wait_for_sequencer_ready().await?;
 
     let new_throughput_report =
         run_soak(directories.clone(), rollup, latest_batch_num, false).await?;
