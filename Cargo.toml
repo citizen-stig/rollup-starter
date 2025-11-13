@@ -38,6 +38,7 @@ sov-db = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7
 sov-hyperlane-integration = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7ade87997fd50099a183648cc4378662a2b0cf14", features = [
   "evm",
 ] }
+sov-test-state-consistency = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7ade87997fd50099a183648cc4378662a2b0cf14" }
 sov-kernels = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7ade87997fd50099a183648cc4378662a2b0cf14" }
 sov-ledger-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7ade87997fd50099a183648cc4378662a2b0cf14" }
 sov-mock-da = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "7ade87997fd50099a183648cc4378662a2b0cf14" }
