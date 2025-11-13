@@ -21,8 +21,8 @@ pub const POSTGRES_CONTAINER_NAME: &str = "postgres-acceptance-test";
 pub const API_URL: &str = "http://localhost:12348";
 
 // Save a full snapshot of the slot every N slots
-const FULL_SLOT_SAVE_INTERVAL: u64 = 5;
-pub const NUM_SOAK_BATCHES: u64 = 10;
+const FULL_SLOT_SAVE_INTERVAL: u64 = 25;
+pub const NUM_SOAK_BATCHES: u64 = 1000;
 
 pub type Runtime = <StarterRollup<Native> as RollupBlueprint<Native>>::Runtime;
 pub type Spec = <StarterRollup<Native> as RollupBlueprint<Native>>::Spec;
@@ -255,6 +255,25 @@ fn save_slot_snapshot_if_needed(
 pub struct ThroughputReport {
     pub num_txs: u64,
     pub num_slots: u64,
+}
+
+pub fn build_rollup(root_dir: PathBuf) -> anyhow::Result<()> {
+    let build_status = Command::new("cargo")
+        .args([
+            "build",
+            "--release",
+            "--features",
+            "acceptance-testing",
+        ])
+        .current_dir(root_dir)
+        .status()
+        .expect("Failed to execute cargo build");
+
+    if build_status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!("Failed to build rollup with exit code: {:?}", build_status.code()))
+    }
 }
 
 /// Send SIGINT to the rollup process to gracefully shut it down.

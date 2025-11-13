@@ -2,9 +2,7 @@ use std::process::Command;
 
 use acceptance_test::fetch_and_compare::{GetItemBehavior, SlotFetcher};
 use acceptance_test::{
-    cleanup_postgres_container, generate_postgres_password, get_rollup_client, interpolate_config,
-    run_soak, start_and_wait_for_postgres_ready, wait_for_sequencer_ready, Directories, Runtime,
-    Spec, API_URL, NUM_SOAK_BATCHES, POSTGRES_CONTAINER_NAME,
+    build_rollup, cleanup_postgres_container, generate_postgres_password, get_rollup_client, interpolate_config, run_soak, start_and_wait_for_postgres_ready, wait_for_sequencer_ready, Directories, Runtime, Spec, API_URL, NUM_SOAK_BATCHES, POSTGRES_CONTAINER_NAME
 };
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
@@ -72,6 +70,11 @@ async fn main() -> Result<(), anyhow::Error> {
     let password = generate_postgres_password()?;
     start_and_wait_for_postgres_ready(POSTGRES_CONTAINER_NAME, &password)?;
     interpolate_config(&password, &directories)?;
+    info!("Building rollup...");
+    if let Err(e) = build_rollup(directories.rollup_root.clone()) {
+        cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
+        anyhow::bail!(e);
+    }
 
     info!(
         "Starting rollup from rollup workspace root: {}",
@@ -81,6 +84,8 @@ async fn main() -> Result<(), anyhow::Error> {
         .args([
             "run",
             "--release",
+            "--features",
+            "acceptance-testing",
             "--",
             "--rollup-config-path",
             &directories
@@ -107,13 +112,15 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // First, run some manual setup. This creates and checks some very simple state with expensive consistency checks.
     do_manual_setup(directories.clone()).await?;
-    let throughput_report = run_soak(directories.clone(), rollup, 3, true).await?;
-    std::fs::write(
-        directories.output_dir.join("throughput_report.json"),
-        serde_json::to_string(&throughput_report)?,
-    )?;
-    save_mock_data(directories.clone())?;
+    let res = run_soak(directories.clone(), rollup, 3, true).await;
     cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
+    if let Ok(throughput_report) = res {
+        std::fs::write(
+            directories.output_dir.join("throughput_report.json"),
+            serde_json::to_string(&throughput_report)?,
+        )?;
+        save_mock_data(directories.clone())?;
+    }
     Ok(())
 }
 

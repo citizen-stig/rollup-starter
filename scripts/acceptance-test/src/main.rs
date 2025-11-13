@@ -1,5 +1,5 @@
 use acceptance_test::fetch_and_compare::SlotFetcher;
-use acceptance_test::ThroughputReport;
+use acceptance_test::{build_rollup, ThroughputReport};
 use acceptance_test::{
     cleanup_postgres_container,
     fetch_and_compare::{compare_against_snapshot, load_snapshot_json},
@@ -90,6 +90,12 @@ async fn run_test() -> Result<(), anyhow::Error> {
 
     // Start the sequencer postgres and wait for it to be ready
     start_and_wait_for_postgres_ready(POSTGRES_CONTAINER_NAME, &password)?;
+
+    info!("Building rollup...");
+    if let Err(e) = build_rollup(directories.rollup_root.clone()) {
+        cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
+        anyhow::bail!(e);
+    }
 
     // Start the rollup. Run for 10 seconds
     info!(
