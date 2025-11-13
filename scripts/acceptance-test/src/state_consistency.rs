@@ -22,17 +22,43 @@ struct ValueResponse<T> {
     value: T,
 }
 
-fn drain_slot_stream(
+async fn drain_slot_stream(
     slot_stream: &mut BoxStream<'static, anyhow::Result<Slot>>,
-    mut latest_slot: Slot,
-) -> Slot {
+) -> anyhow::Result<Option<Slot>> {
+    const MAX_CONSECUTIVE_ERRORS: u32 = 5;
+    let mut consecutive_errors = 0;
+
+    let mut latest_slot = loop {
+        match slot_stream.next().await {
+            Some(Ok(slot)) => {
+                break slot;
+            }
+            Some(Err(e)) => {
+                consecutive_errors += 1;
+                tracing::error!(
+                    "Error receiving slot (attempt {}/{}): {}",
+                    consecutive_errors,
+                    MAX_CONSECUTIVE_ERRORS,
+                    e
+                );
+                if consecutive_errors >= MAX_CONSECUTIVE_ERRORS {
+                    anyhow::bail!(
+                        "Too many consecutive slot stream errors ({}), worker exiting",
+                        MAX_CONSECUTIVE_ERRORS
+                    );
+                }
+                continue; // Keep trying until we get a valid slot
+            }
+            None => return Ok(None), // Stream closed
+        }
+    };
+
     tracing::info!(
         "State validation: got new slot notification, number = {}",
         latest_slot.number
     );
 
-    // Check if there are any additional slots already queued (non-blocking)
-    // If so, we're falling behind and should fail
+    // Drain any additional queued slots (non-blocking)
     let mut drained_count = 0;
     while let Some(Some(Ok(slot))) = slot_stream.next().now_or_never() {
         latest_slot = slot;
@@ -46,7 +72,7 @@ fn drain_slot_stream(
         );
     }
 
-    latest_slot
+    Ok(Some(latest_slot))
 }
 
 async fn query_state_value<T: DeserializeOwned>(
@@ -241,15 +267,9 @@ pub async fn state_validation_worker(
     tracing::info!("State validation worker started");
 
     while !*rx.borrow() {
-        let latest_slot = match slot_stream.next().await {
-            Some(Ok(slot)) => slot,
-            Some(Err(e)) => {
-                tracing::error!("Error receiving slot: {}", e);
-                continue;
-            }
-            None => break,
+        let Some(latest_slot) = drain_slot_stream(&mut slot_stream).await? else {
+            break; // Stream closed
         };
-        let latest_slot = drain_slot_stream(&mut slot_stream, latest_slot);
 
         // There's a race condition between slot notification and checkpoint update, so poll until
         // they match
