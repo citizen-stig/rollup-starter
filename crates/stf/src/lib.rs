@@ -1,5 +1,6 @@
 //! The rollup State Transition Function.
 
+pub mod authentication;
 mod delegation;
 pub mod runtime;
 

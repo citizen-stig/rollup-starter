@@ -57,9 +57,10 @@ clean: ## Clean all builds and artifacts and databases
 	$(MAKE) -C integrations clean
 
 clean-db: ## Clean all databases
-	rm -rf test-data/rollup-starter-data
-	rm -rf test-data/rollup-starter-data-celestia
-	rm -rf test-data/mock_da.sqlite
+	rm -rf rollup-state/rollup-starter-data-mock
+	rm -rf rollup-state/rollup-starter-data-celestia
+	rm -rf rollup-state/rollup-starter-data-external
+	rm -rf rollup-state/mock_da.sqlite
 	rm -rf test-data/docker
 
 # Add `--build-arg BUILD_MODE=release` for release builds

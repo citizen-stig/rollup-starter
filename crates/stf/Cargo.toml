@@ -17,6 +17,7 @@ sov-modules-stf-blueprint = { workspace = true }
 sov-capabilities = { workspace = true }
 sov-kernels = { workspace = true }
 sov-rollup-apis = { workspace = true, optional = true }
+sov-state = { workspace = true }
 sov-sequencer-registry = { workspace = true }
 sov-paymaster = { workspace = true }
 sov-hyperlane-integration = { workspace = true }
@@ -24,6 +25,11 @@ sov-bank = { workspace = true }
 sov-test-state-consistency = { workspace = true }
 sov-address = { workspace = true }
 sov-evm = { workspace = true }
+sov-eip712-auth = { workspace = true }
+
+anyhow = { workspace = true }
+alloy-consensus = { workspace = true, optional = true }
+borsh = { workspace = true }
 
 [build-dependencies]
 anyhow = { workspace = true }
@@ -40,31 +46,36 @@ sov-build = { workspace = true }
 [features]
 default = []
 mock_da = ["sov-mock-da"]
+mock_da_external = ["sov-mock-da"]
 celestia_da = ["sov-celestia-adapter"]
 acceptance-testing = ["stf-starter-declaration/acceptance-testing"]
 native = [
-	"stf-starter-declaration/native",
-	"sov-modules-api/native",
-	"sov-modules-stf-blueprint/native",
-	"sov-rollup-interface/native",
-	"sov-capabilities/native",
-	"sov-rollup-apis",
-	"sov-kernels/native",
-	"sov-paymaster/native",
-	"sov-hyperlane-integration/native",
-	"sov-sequencer-registry/native",
-	"sov-bank/native",
-	"sov-address/native",
-	"sov-mock-da?/native",
-	"sov-celestia-adapter?/native",
-	"sov-mock-zkvm/native",
-	"sov-evm/native",
-	"sov-test-state-consistency/native"
+    "stf-starter-declaration/native",
+    "sov-modules-api/native",
+    "sov-modules-stf-blueprint/native",
+    "sov-rollup-interface/native",
+    "sov-capabilities/native",
+    "sov-rollup-apis",
+    "sov-kernels/native",
+    "sov-paymaster/native",
+    "sov-hyperlane-integration/native",
+    "sov-sequencer-registry/native",
+    "sov-bank/native",
+    "sov-address/native",
+    "sov-mock-da?/native",
+    "sov-celestia-adapter?/native",
+    "sov-mock-zkvm/native",
+    "sov-evm/native",
+	"sov-test-state-consistency/native",
+    "sov-eip712-auth/native",
+    "sov-state/native",
+    "alloy-consensus"
 ]
 
 bench = [
-  "stf-starter-declaration/bench",
-  "sov-modules-api/bench",
-  "sov-modules-stf-blueprint/bench",
-  "sov-celestia-adapter?/bench",
+    "stf-starter-declaration/bench",
+    "sov-modules-api/bench",
+    "sov-modules-stf-blueprint/bench",
+    "sov-celestia-adapter?/bench",
+    "sov-state/bench"
 ]

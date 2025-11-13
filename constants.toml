@@ -10,6 +10,18 @@ freeze = [1, 1]
 # We use the ID 4321 for demo purposes. Change this value before deploying!
 CHAIN_ID = 6669
 CHAIN_NAME = "TestChain"
+
+# The namespace used by the rollup to store its data.
+# Using byte_string to convert to ASCII bytes
+# Should be 10 bytes long for Celestia
+BATCH_NAMESPACE = { byte_string = "sovstarter" }
+# The namespace used by the rollup to store aggregated ZK proofs.
+# This is "sov-test-p" encoded as ASCII bytes.
+# "hex" format is used as an example, that it is possible to define namespace as any sequence of bytes.
+# `python3 -c "import sys; print('0x' + sys.argv[1].encode().hex())" "sov-proofs"`
+# Should be 10 bytes long for Celestia
+PROOF_NAMESPACE = { hex = "0x736f762d70726f6f6673" }
+
 EVM_GAS_METERING_MODE = "Rollup"
 # We will keep only this many blocks in the EVM module.
 EVM_BLOCK_PRUNING_THRESHOLD = 100000
@@ -36,7 +48,9 @@ STATE_ROOT_DELAY_BLOCKS = 5
 UNREGISTERED_BLOBS_PER_SLOT = 5
 # How many past transaction generations into the past to keep per-account buckets for
 # Higher numbers give more flexibility to avoid collisions, lower numbers reduce the maximum amount of storage used
-PAST_TRANSACTION_GENERATIONS = 5
+# The default recommendation for users is to use a timestamp in milliseconds for submitting transactions,
+# so keeping the last 5000 generations valid translates to 5 seconds of transaction reordering
+PAST_TRANSACTION_GENERATIONS = 5000
 # The maximum number of transactions hashes we remember per credential.
 # Higher numbers allow accounts to send more transactions without updating their generation number.
 # This is more user friendly for power users, but increases the worst case cost of the uniqueness check.
@@ -179,7 +193,7 @@ TEST_ACCESSORY_MODULE_DISCRIMINANT = 245
 MY_MODULE_DISCRIMINANT = 246
 TEST_MODULE_DISCRIMINANT = 247
 ROUTING_RECIPIENT_DISCRIMINANT = 248
-EXAMPLE_MODULE_DISCRIMINANT = 249 
+EXAMPLE_MODULE_DISCRIMINANT = 249
 SYNTHETIC_LOAD_DISCRIMINANT = 250
 TEST_RECIPIENT_DISCRIMINANT = 251
 ACCESS_PATTERN_DISCRIMINANT = 252

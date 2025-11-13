@@ -1,6 +1,6 @@
 use sov_cli::wallet_state::PrivateKeyAndAddress;
 use std::net::SocketAddr;
-use std::num::{NonZeroU64, NonZeroUsize};
+use std::num::{NonZero, NonZeroU64, NonZeroUsize};
 use std::path::Path;
 
 use rollup_starter::rollup::StarterRollup;
@@ -34,11 +34,11 @@ pub async fn start_rollup(
     let rollup_config = RollupConfig {
         storage: RollupDbConfig::default_in_path(temp_path.to_path_buf()),
         runner: RunnerConfig {
-            genesis_height: 0,
             da_polling_interval_ms: 200,
             http_config: HttpServerConfig::localhost_on_free_port(),
-            concurrent_sync_tasks: Some(1),
+            concurrent_sync_tasks: 1,
             save_tx_bodies: false,
+            pre_fetched_blocks_capacity: NonZero::new(3).unwrap(),
             da_total_timeout_secs: 3_600,
         },
         da: da_config,
@@ -61,6 +61,7 @@ pub async fn start_rollup(
             blob_processing_timeout_secs: 60,
             extension: Some(SeqConfigExtension {
                 max_log_limit: 20000,
+                response_size_limit: (1024 * 1024) - (1024 * 30), // Limit our response size to 1MB, leaving 30kb for headers, overhead, and misestimation.
             }),
             sequencer_kind_config: SequencerKindConfig::Preferred(PreferredSequencerConfig {
                 recovery_strategy: RecoveryStrategy::None,
