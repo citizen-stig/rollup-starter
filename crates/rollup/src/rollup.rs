@@ -162,7 +162,6 @@ impl FullNodeBlueprint<Native> for StarterRollup<Native> {
                 max_log_limit: 20_000,
                 response_size_limit: (1024 * 1024) - (1024 * 30), // Limit our response size to 1MB, leaving 30kb for headers, overhead, and misestimation.
             },
-            buffer_raw_txs: true,
             shutdown_receiver,
         };
 

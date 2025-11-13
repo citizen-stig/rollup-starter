@@ -57,9 +57,9 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "alloy-chains"
-version = "0.2.17"
+version = "0.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6068f356948cd84b5ad9ac30c50478e433847f14a50714d2b68f15d052724049"
+checksum = "bfaa9ea039a6f9304b4a593d780b1f23e1ae183acdee938b11b38795acacc9f1"
 dependencies = [
  "alloy-primitives",
  "num_enum 0.7.5",
@@ -68,9 +68,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-consensus"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90d103d3e440ad6f703dd71a5b58a6abd24834563bde8a5fabe706e00242f810"
+checksum = "ad704069c12f68d0c742d0cad7e0a03882b42767350584627fbf8a47b1bf1846"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -79,6 +79,7 @@ dependencies = [
  "alloy-trie",
  "alloy-tx-macros",
  "auto_impl",
+ "borsh",
  "c-kzg",
  "derive_more 2.0.1",
  "either",
@@ -94,9 +95,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-consensus-any"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48ead76c8c84ab3a50c31c56bc2c748c2d64357ad2131c32f9b10ab790a25e1a"
+checksum = "bc374f640a5062224d7708402728e3d6879a514ba10f377da62e7dfb14c673e6"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -165,9 +166,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-eips"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bdbec74583d0067798d77afa43d58f00d93035335d7ceaa5d3f93857d461bb9"
+checksum = "7e867b5fd52ed0372a95016f3a37cbff95a9d5409230fbaef2d8ea00e8618098"
 dependencies = [
  "alloy-eip2124",
  "alloy-eip2930",
@@ -176,6 +177,7 @@ dependencies = [
  "alloy-rlp",
  "alloy-serde",
  "auto_impl",
+ "borsh",
  "c-kzg",
  "derive_more 2.0.1",
  "either",
@@ -187,14 +189,15 @@ dependencies = [
 
 [[package]]
 name = "alloy-genesis"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c25d5acb35706e683df1ea333c862bdb6b7c5548836607cd5bb56e501cca0b4f"
+checksum = "b90be17e9760a6ba6d13cebdb049cea405ebc8bf57d90664ed708cc5bc348342"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "alloy-serde",
  "alloy-trie",
+ "borsh",
  "serde",
  "serde_with",
 ]
@@ -226,9 +229,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-network-primitives"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0e7918396eecd69d9c907046ec8a93fb09b89e2f325d5e7ea9c4e3929aa0dd2"
+checksum = "0d3ae2777e900a7a47ad9e3b8ab58eff3d93628265e73bbdee09acf90bf68f75"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -288,9 +291,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-rpc-types-eth"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a15e4831b71eea9d20126a411c1c09facf1d01d5cac84fd51d532d3c429cfc26"
+checksum = "29031a6bf46177d65efce661f7ab37829ca09dd341bc40afb5194e97600655cc"
 dependencies = [
  "alloy-consensus",
  "alloy-consensus-any",
@@ -309,9 +312,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-serde"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "751d1887f7d202514a82c5b3caf28ee8bd4a2ad9549e4f498b6f0bff99b52add"
+checksum = "01e856112bfa0d9adc85bd7c13db03fad0e71d1d6fb4c2010e475b6718108236"
 dependencies = [
  "alloy-primitives",
  "serde",
@@ -406,9 +409,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-tx-macros"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd7ce8ed34106acd6e21942022b6a15be6454c2c3ead4d76811d3bdcd63cf771"
+checksum = "7ccf423f6de62e8ce1d6c7a11fb7508ae3536d02e0d68aaeb05c8669337d0937"
 dependencies = [
  "darling 0.21.3",
  "proc-macro2",
@@ -466,22 +469,22 @@ dependencies = [
 
 [[package]]
 name = "anstyle-query"
-version = "1.1.4"
+version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e231f6134f61b71076a3eab506c379d4f36122f2af15a9ff04415ea4c3339e2"
+checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
 name = "anstyle-wincon"
-version = "3.0.10"
+version = "3.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e0633414522a32ffaac8ac6cc8f748e090c5717661fddeea04219e2344f5f2a"
+checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -884,9 +887,9 @@ dependencies = [
 
 [[package]]
 name = "aws-lc-rs"
-version = "1.14.1"
+version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "879b6c89592deb404ba4dc0ae6b58ffd1795c78991cbb5b8bc441c48a070440d"
+checksum = "5932a7d9d28b0d2ea34c6b3779d35e3dd6f6345317c34e73438c4f1f29144151"
 dependencies = [
  "aws-lc-sys",
  "zeroize",
@@ -894,9 +897,9 @@ dependencies = [
 
 [[package]]
 name = "aws-lc-sys"
-version = "0.32.3"
+version = "0.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "107a4e9d9cab9963e04e84bb8dee0e25f2a987f9a8bad5ed054abd439caa8f8c"
+checksum = "1826f2e4cfc2cd19ee53c42fbf68e2f81ec21108e0b7ecf6a71cf062137360fc"
 dependencies = [
  "bindgen 0.72.1",
  "cc",
@@ -2129,12 +2132,14 @@ dependencies = [
 [[package]]
 name = "curve25519-dalek-ng"
 version = "4.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c359b7249347e46fb28804470d071c921156ad62b3eef5d34e2ba867533dec8"
+source = "git+https://github.com/sp1-patches/curve25519-dalek-ng.git?branch=patch-v4.1.1#3fb3e7f6047ddeef0f0c9212f4604bd30d64bd28"
 dependencies = [
+ "anyhow",
  "byteorder",
+ "cfg-if",
  "digest 0.9.0",
  "rand_core 0.6.4",
+ "sp1-lib 3.4.0",
  "subtle-ng",
  "zeroize",
 ]
@@ -2551,8 +2556,7 @@ dependencies = [
 [[package]]
 name = "ed25519-consensus"
 version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c8465edc8ee7436ffea81d21a019b16676ee3db267aa8d5a8d729581ecf998b"
+source = "git+https://github.com/sp1-patches/ed25519-consensus?branch=patch-v2.1.0#2b2c4b43344bc4daf5b1326f367f2d9d661eeabb"
 dependencies = [
  "curve25519-dalek-ng",
  "hex",
@@ -3062,6 +3066,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "guest-mock-starter-sp1"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "sov-address",
+ "sov-kernels",
+ "sov-metrics",
+ "sov-mock-da",
+ "sov-mock-zkvm",
+ "sov-modules-api",
+ "sov-modules-stf-blueprint",
+ "sov-rollup-interface",
+ "sov-sp1-adapter",
+ "sov-state",
+ "sp1-zkvm",
+ "stf-starter",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3374,9 +3398,9 @@ dependencies = [
 
 [[package]]
 name = "hyper-util"
-version = "0.1.17"
+version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c6995591a8f1380fcb4ba966a252a4b29188d51d2b89e3a252f5305be65aea8"
+checksum = "52e9a2a24dc5c6821e71a7030e1e14b7b632acac55c40e9d2e082c621261bb56"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -6727,25 +6751,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sov-demo-prover-guest-celestia-sp1"
-version = "0.3.0"
-dependencies = [
- "anyhow",
- "sov-address",
- "sov-celestia-adapter",
- "sov-kernels",
- "sov-metrics",
- "sov-mock-zkvm",
- "sov-modules-api",
- "sov-modules-stf-blueprint",
- "sov-rollup-interface",
- "sov-sp1-adapter",
- "sov-state",
- "sp1-zkvm",
- "stf-starter",
-]
-
-[[package]]
 name = "sov-eip712-auth"
 version = "0.3.0"
 source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
@@ -6847,6 +6852,26 @@ dependencies = [
  "serde",
  "sov-rollup-interface",
  "sp1-lib 5.2.2",
+]
+
+[[package]]
+name = "sov-mock-da"
+version = "0.3.0"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "borsh",
+ "bytes",
+ "derive_more 1.0.0",
+ "hex",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "sov-rollup-interface",
+ "tracing",
+ "url",
 ]
 
 [[package]]
@@ -7691,6 +7716,7 @@ dependencies = [
  "sov-evm",
  "sov-hyperlane-integration",
  "sov-kernels",
+ "sov-mock-da",
  "sov-mock-zkvm",
  "sov-modules-api",
  "sov-modules-stf-blueprint",
