@@ -211,13 +211,12 @@ where
     let encoded_tx = Seq::Rt::encode_with_eip712_auth(raw_tx);
 
     // Submit to sequencer (similar to axum_accept_tx but with EIP712 auth)
-    let tx_with_hash = sequencer.accept_tx(encoded_tx).await
-        .map_err(|e| {
-            if e.status.is_server_error() {
-                tracing::error!(error = ?e, "Error accepting EIP712 transaction");
-            }
-            IntoResponse::into_response(e)
-        })?;
+    let tx_with_hash = sequencer.accept_tx(encoded_tx).await.map_err(|e| {
+        if e.status.is_server_error() {
+            tracing::error!(error = ?e, "Error accepting EIP712 transaction");
+        }
+        IntoResponse::into_response(e)
+    })?;
 
     Ok(TxInfoWithConfirmation {
         id: tx_with_hash.tx_hash,

@@ -196,8 +196,14 @@ async fn run_test() -> Result<(), anyhow::Error> {
     // Wait for the sequencer to resync to the empty DA slots
     wait_for_sequencer_ready().await?;
 
-    let new_throughput_report =
-        run_soak(directories.clone(), rollup, latest_batch_num, stop_at_height, false).await?;
+    let new_throughput_report = run_soak(
+        directories.clone(),
+        rollup,
+        latest_batch_num,
+        stop_at_height,
+        false,
+    )
+    .await?;
     let previous_throughput_report: ThroughputReport = serde_json::from_str::<ThroughputReport>(
         &std::fs::read_to_string(directories.output_dir.join("throughput_report.json"))?,
     )?;

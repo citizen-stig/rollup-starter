@@ -282,7 +282,8 @@ pub async fn state_validation_worker(
 
         // There's a race condition between slot notification and API state update, so poll until
         // the new visible slot is actually visible in the API
-        let visible_slot = poll_for_visible_slot_update(&client, latest_slot.number, last_visible_slot).await?;
+        let visible_slot =
+            poll_for_visible_slot_update(&client, latest_slot.number, last_visible_slot).await?;
 
         // Get the other two kernel values
         let (state_root_result, rollup_height_result) =
