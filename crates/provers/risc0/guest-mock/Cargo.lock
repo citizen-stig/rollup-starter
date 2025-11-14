@@ -2741,7 +2741,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 [[package]]
 name = "nearly-linear"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 
 [[package]]
 name = "nmt-rs"
@@ -2763,8 +2763,9 @@ checksum = "a5b0c77c1b780822bc749a33e39aeb2c07584ab93332303babeabb645298a76e"
 
 [[package]]
 name = "nomt-core"
-version = "1.0.0-preview"
-source = "git+https://github.com/thrumdev/nomt.git?rev=24b8e4132f20c7c8083b83dd51c52098225cf6a9#24b8e4132f20c7c8083b83dd51c52098225cf6a9"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "feeb4e411c8185c33c906539b78330a8478a2d4819de338efb6511b33cc73207"
 dependencies = [
  "arrayvec",
  "bitvec",
@@ -4534,7 +4535,7 @@ dependencies = [
 [[package]]
 name = "sov-accounts"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4548,7 +4549,7 @@ dependencies = [
 [[package]]
 name = "sov-address"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "alloy-primitives",
  "anyhow",
@@ -4566,7 +4567,7 @@ dependencies = [
 [[package]]
 name = "sov-attester-incentives"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4586,7 +4587,7 @@ dependencies = [
 [[package]]
 name = "sov-bank"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4605,7 +4606,7 @@ dependencies = [
 [[package]]
 name = "sov-blob-storage"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4625,7 +4626,7 @@ dependencies = [
 [[package]]
 name = "sov-build"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4638,7 +4639,7 @@ dependencies = [
 [[package]]
 name = "sov-capabilities"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "sov-accounts",
@@ -4657,7 +4658,7 @@ dependencies = [
 [[package]]
 name = "sov-celestia-adapter"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4683,7 +4684,7 @@ dependencies = [
 [[package]]
 name = "sov-chain-state"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4700,7 +4701,7 @@ dependencies = [
 [[package]]
 name = "sov-eip712-auth"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4718,7 +4719,7 @@ dependencies = [
 [[package]]
 name = "sov-evm"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4756,7 +4757,7 @@ dependencies = [
 [[package]]
 name = "sov-hyperlane-integration"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4778,7 +4779,7 @@ dependencies = [
 [[package]]
 name = "sov-kernels"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "sov-blob-storage",
@@ -4791,7 +4792,7 @@ dependencies = [
 [[package]]
 name = "sov-metrics"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -4805,7 +4806,7 @@ dependencies = [
 [[package]]
 name = "sov-mock-da"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4825,7 +4826,7 @@ dependencies = [
 [[package]]
 name = "sov-mock-zkvm"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -4843,7 +4844,7 @@ dependencies = [
 [[package]]
 name = "sov-modules-api"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -4876,7 +4877,7 @@ dependencies = [
 [[package]]
 name = "sov-modules-macros"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bech32",
@@ -4898,7 +4899,7 @@ dependencies = [
 [[package]]
 name = "sov-modules-stf-blueprint"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4916,7 +4917,7 @@ dependencies = [
 [[package]]
 name = "sov-operator-incentives"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4934,7 +4935,7 @@ dependencies = [
 [[package]]
 name = "sov-paymaster"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bcs",
@@ -4953,7 +4954,7 @@ dependencies = [
 [[package]]
 name = "sov-prover-incentives"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4972,7 +4973,7 @@ dependencies = [
 [[package]]
 name = "sov-revenue-share"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -4987,7 +4988,7 @@ dependencies = [
 [[package]]
 name = "sov-risc0-adapter"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -5012,7 +5013,7 @@ dependencies = [
 [[package]]
 name = "sov-rollup-interface"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5031,7 +5032,7 @@ dependencies = [
 [[package]]
 name = "sov-sequencer-registry"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -5047,7 +5048,7 @@ dependencies = [
 [[package]]
 name = "sov-state"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "bcs",
@@ -5068,7 +5069,7 @@ dependencies = [
 [[package]]
 name = "sov-test-state-consistency"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -5083,7 +5084,7 @@ dependencies = [
 [[package]]
 name = "sov-uniqueness"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "borsh",
@@ -5095,8 +5096,8 @@ dependencies = [
 
 [[package]]
 name = "sov-universal-wallet"
-version = "0.1.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+version = "0.3.0"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "alloy-dyn-abi",
  "alloy-primitives",
@@ -5117,8 +5118,8 @@ dependencies = [
 
 [[package]]
 name = "sov-universal-wallet-macro-helpers"
-version = "0.1.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+version = "0.3.0"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "bech32",
  "borsh",
@@ -5134,8 +5135,8 @@ dependencies = [
 
 [[package]]
 name = "sov-universal-wallet-macros"
-version = "0.1.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+version = "0.3.0"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "proc-macro2",
  "sov-universal-wallet-macro-helpers",
@@ -5145,7 +5146,7 @@ dependencies = [
 [[package]]
 name = "sov-zkvm-utils"
 version = "0.3.0"
-source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=d84cde946190d20ae48462617c5511a54fd0d730#d84cde946190d20ae48462617c5511a54fd0d730"
+source = "git+https://github.com/Sovereign-Labs/sovereign-sdk.git?rev=1a23feceae8f43a7172dc2595a70da437d5beb5f#1a23feceae8f43a7172dc2595a70da437d5beb5f"
 dependencies = [
  "anyhow",
  "convert_case 0.6.0",
