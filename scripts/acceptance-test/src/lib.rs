@@ -329,6 +329,7 @@ pub async fn run_soak(
     directories: Directories,
     mut rollup: std::process::Child,
     num_previous_batches: u64,
+    rollup_stop_height: u64,
     save_slot_snapshots: bool,
 ) -> Result<ThroughputReport, anyhow::Error> {
     let (rollup_tx, mut rollup_rx) = tokio::sync::oneshot::channel();
@@ -348,6 +349,7 @@ pub async fn run_soak(
     let state_validator_rx = tx.subscribe();
     worker_set.spawn(state_validation_worker(
         state_validator_client,
+        rollup_stop_height,
         state_validator_rx,
     ));
 
@@ -391,6 +393,7 @@ pub async fn run_soak(
                                 // If we're very close to the end of the test, the rollup might have shut down before we could finish querying.
                                 // The test shouldn't fail for this reason, so we just skip the batch.
                                 if num_soak_batches + 15 > NUM_SOAK_BATCHES {
+                                    tracing::debug!("Soak slot fetcher encountered an error near the end of the test; num_soak_batches: {num_soak_batches}, NUM_SOAK_BATCHES: {NUM_SOAK_BATCHES}, slot number: {}, rollup_stop_height: {rollup_stop_height}", slot.number);
                                     tracing::warn!("Encountered an error very near the end of the test. Assuming the rollup shut down.");
                                     break;
                                 } else {

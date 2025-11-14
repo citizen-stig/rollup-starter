@@ -78,6 +78,8 @@ async fn main() -> Result<(), anyhow::Error> {
         anyhow::bail!(e);
     }
 
+    let stop_at_height = NUM_SOAK_BATCHES + 10;
+
     info!(
         "Starting rollup from rollup workspace root: {}",
         directories.rollup_root.display()
@@ -102,7 +104,7 @@ async fn main() -> Result<(), anyhow::Error> {
                 .display()
                 .to_string(),
             "--stop-at-rollup-height",
-            &(NUM_SOAK_BATCHES + 10).to_string(),
+            &stop_at_height.to_string(),
         ])
         .current_dir(directories.rollup_root.clone())
         .env("RUST_LOG", "info")
@@ -114,7 +116,7 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // First, run some manual setup. This creates and checks some very simple state with expensive consistency checks.
     do_manual_setup(directories.clone()).await?;
-    let res = run_soak(directories.clone(), rollup, 3, true).await;
+    let res = run_soak(directories.clone(), rollup, 3, stop_at_height, true).await;
     cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
     if let Ok(throughput_report) = res {
         std::fs::write(

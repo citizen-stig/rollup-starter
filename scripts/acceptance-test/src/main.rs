@@ -103,6 +103,8 @@ async fn run_test() -> Result<(), anyhow::Error> {
         directories.rollup_root.display()
     );
 
+    let stop_at_height = NUM_SOAK_BATCHES * 2 + 10;
+
     let rollup = Command::new("cargo")
         .args([
             "run",
@@ -123,7 +125,7 @@ async fn run_test() -> Result<(), anyhow::Error> {
                 .display()
                 .to_string(),
             "--stop-at-rollup-height",
-            &((NUM_SOAK_BATCHES * 2).to_string()),
+            &(stop_at_height.to_string()),
         ])
         .current_dir(directories.rollup_root.clone())
         .env("RUST_LOG", "info")
@@ -195,7 +197,7 @@ async fn run_test() -> Result<(), anyhow::Error> {
     wait_for_sequencer_ready().await?;
 
     let new_throughput_report =
-        run_soak(directories.clone(), rollup, latest_batch_num, false).await?;
+        run_soak(directories.clone(), rollup, latest_batch_num, stop_at_height, false).await?;
     let previous_throughput_report: ThroughputReport = serde_json::from_str::<ThroughputReport>(
         &std::fs::read_to_string(directories.output_dir.join("throughput_report.json"))?,
     )?;
