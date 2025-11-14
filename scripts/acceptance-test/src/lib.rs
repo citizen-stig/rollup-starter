@@ -181,8 +181,8 @@ pub fn get_rollup_client() -> Result<sov_api_spec::Client, anyhow::Error> {
 }
 
 pub async fn wait_for_sequencer_ready() -> Result<(), anyhow::Error> {
-    // Wait up to two minutes for the sequencer to be ready
-    for _ in 0..1200 {
+    // Wait up to a minute for the sequencer to be ready
+    for _ in 0..600 {
         if let Ok(response) = reqwest::get(format!("{}/sequencer/ready", API_URL)).await {
             if response.status().is_success() {
                 break;
