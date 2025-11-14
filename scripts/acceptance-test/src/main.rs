@@ -36,39 +36,42 @@ async fn main() -> Result<(), anyhow::Error> {
     result
 }
 
+fn ignore_file_not_found<OK: Default>(e: std::io::Error) -> std::io::Result<OK> {
+    if e.kind() == std::io::ErrorKind::NotFound {
+        Ok(OK::default())
+    } else {
+        Err(e)
+    }
+}
+
 fn copy_persistent_mock_data(directories: &Directories) -> Result<(), anyhow::Error> {
     tracing::info!("Copying persistent mock data back to mock_da.sqlite");
+    // Clean up any files from any previous runs. This is needed particularly for the shm and wal
+    // files since they may not get overwritten by a copy, but we do all three for consistency.
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite"))
+        .or_else(ignore_file_not_found)?;
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite-shm"))
+        .or_else(ignore_file_not_found)?;
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite-wal"))
+        .or_else(ignore_file_not_found)?;
+
+    // Then copy the base file, always
     std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite"),
         directories.output_dir.join("mock_da.sqlite"),
     )?;
-    if let Err(e) = std::fs::copy(
+    // And the dangling wal and shm only if they exist
+    std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite-shm"),
         directories.output_dir.join("mock_da.sqlite-shm"),
-    ) {
-        if e.kind() != std::io::ErrorKind::NotFound {
-            anyhow::bail!(
-                "Failed to copy persistent_mock_da.sqlite-shm back to mock_da.sqlite-shm: {}",
-                e
-            );
-        }
-        tracing::trace!(
-            "No persistent_mock_da.sqlite-shm found: {}. Proceeding anyway.",
-            e
-        );
-    }
-    if let Err(e) = std::fs::copy(
+    )
+    .or_else(ignore_file_not_found)?;
+    std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite-wal"),
         directories.output_dir.join("mock_da.sqlite-wal"),
-    ) {
-        if e.kind() != std::io::ErrorKind::NotFound {
-            anyhow::bail!(
-                "Failed to copy persistent_mock_da.sqlite-wal back to mock_da.sqlite-wal: {}",
-                e
-            );
-        }
-        tracing::trace!("Failed to copy persistent_mock_da.sqlite-wal back to mock_da.sqlite-wal: {}. Proceeding anyway.", e);
-    }
+    )
+    .or_else(ignore_file_not_found)?;
+
     tracing::info!("Persistent mock data copied back to mock_da.sqlite");
     Ok(())
 }
