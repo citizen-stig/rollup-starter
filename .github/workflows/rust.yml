@@ -94,11 +94,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: make build-docker-mock-da
-
-      - name: Run Docker container in background
-        run: make run-docker-mock-da BACKGROUND=true
+      - name: Build Docker image and run it in the background
+        run: |
+          make build-docker-mock-da
+          make run-docker-mock-da BACKGROUND=true
 
       - name: Wait for rollup to be ready
         run: |
