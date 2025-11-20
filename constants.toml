@@ -38,7 +38,7 @@ DEFERRED_SLOTS_COUNT = 100000
 # The maximum number of visible slots that the sequencer can advance the rollup in a single slot.
 # Larger values of this parameter mean that the soft-confirmations are less vulnerable to congestion on the DA layer,
 # but make it correspondingly easier for a malicious sequencer to grief other sequencers.
-MAX_VISIBLE_HEIGHT_INCREASE_PER_SLOT = 10
+MAX_VISIBLE_HEIGHT_INCREASE_PER_SLOT = 20
 # How many *rollup blocks* we wait before making a state root visible to the rollup.
 # This value should always be set to at least 1
 STATE_ROOT_DELAY_BLOCKS = 5
