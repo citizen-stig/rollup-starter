@@ -34,7 +34,7 @@ SETUP_MODE_TERMINATION_HEIGHT = 0 # Disable setup mode entirely by default.
 # will be invalidated due to congestion on the DA layer. (Note that with an honest sequencer, this parameter has no effect
 # on the speed of inclusion for forced transactions, since they will always be included ASAP.)
 # Setting this parameter to 0 disables soft-confirmations entirely.
-DEFERRED_SLOTS_COUNT = 5000
+DEFERRED_SLOTS_COUNT = 100000
 # The maximum number of visible slots that the sequencer can advance the rollup in a single slot.
 # Larger values of this parameter mean that the soft-confirmations are less vulnerable to congestion on the DA layer,
 # but make it correspondingly easier for a malicious sequencer to grief other sequencers.
