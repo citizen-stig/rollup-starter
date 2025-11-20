@@ -28,9 +28,9 @@ user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for produc
 # It allows avoiding allocating 256GB at the start
 user_preallocate_ht = false
 kernel_commit_concurrency = 2
-# Run pruning once every 100_000 blocks. Prune any keys more than 100 versions old
-pruner_block_interval = 100_000
-pruner_versions_to_keep = 100
+# Disable pruning for now
+# pruner_block_interval = 100_000
+# pruner_versions_to_keep = 100
 state_cache_size = 10000000000 # 10GB
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
