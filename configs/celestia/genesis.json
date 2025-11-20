@@ -110,7 +110,7 @@
     "sequencer_config": {
       "seq_rollup_address": "0xA6edfca3AA985Dd3CC728BFFB700933a986aC085",
       "seq_da_address": "celestia1a68m2l85zn5xh0l07clk4rfvnezhywc53g8x7s",
-      "seq_bond": "100000000000",
+      "seq_bond": "1000000000000000000000000000",
       "is_preferred_sequencer": true
     }
   },
