@@ -13026,6 +13026,7 @@ dependencies = [
  "sov-build",
  "sov-capabilities",
  "sov-celestia-adapter",
+ "sov-chain-state",
  "sov-eip712-auth",
  "sov-evm",
  "sov-hyperlane-integration",

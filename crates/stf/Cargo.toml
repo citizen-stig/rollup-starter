@@ -20,6 +20,7 @@ sov-rollup-apis = { workspace = true, optional = true }
 sov-state = { workspace = true }
 sov-sequencer-registry = { workspace = true }
 sov-paymaster = { workspace = true }
+sov-chain-state = { workspace = true }
 sov-hyperlane-integration = { workspace = true }
 sov-bank = { workspace = true }
 sov-test-state-consistency = { workspace = true }
