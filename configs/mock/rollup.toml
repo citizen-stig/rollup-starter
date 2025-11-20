@@ -84,5 +84,13 @@ ideal_lag_behind_finalized_slot = 1
 # This variable determines the number of worker threads.
 num_cache_warmup_workers = 0
 is_replica = true
+
+[sequencer.preferred.timing_oracle]
+priority_fee_percentage = 0
+max_fee = 1_000_000
+interval_millis = 50
+
 [sequencer.extension]
 max_log_limit = 20000
+
+
