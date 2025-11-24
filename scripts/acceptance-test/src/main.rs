@@ -1,5 +1,5 @@
 use acceptance_test::fetch_and_compare::SlotFetcher;
-use acceptance_test::ThroughputReport;
+use acceptance_test::{build_rollup, wait_for_sequencer_ready, ThroughputReport};
 use acceptance_test::{
     cleanup_postgres_container,
     fetch_and_compare::{compare_against_snapshot, load_snapshot_json},
@@ -36,39 +36,42 @@ async fn main() -> Result<(), anyhow::Error> {
     result
 }
 
+fn ignore_file_not_found<OK: Default>(e: std::io::Error) -> std::io::Result<OK> {
+    if e.kind() == std::io::ErrorKind::NotFound {
+        Ok(OK::default())
+    } else {
+        Err(e)
+    }
+}
+
 fn copy_persistent_mock_data(directories: &Directories) -> Result<(), anyhow::Error> {
     tracing::info!("Copying persistent mock data back to mock_da.sqlite");
+    // Clean up any files from any previous runs. This is needed particularly for the shm and wal
+    // files since they may not get overwritten by a copy, but we do all three for consistency.
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite"))
+        .or_else(ignore_file_not_found)?;
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite-shm"))
+        .or_else(ignore_file_not_found)?;
+    std::fs::remove_file(directories.output_dir.join("mock_da.sqlite-wal"))
+        .or_else(ignore_file_not_found)?;
+
+    // Then copy the base file, always
     std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite"),
         directories.output_dir.join("mock_da.sqlite"),
     )?;
-    if let Err(e) = std::fs::copy(
+    // And the dangling wal and shm only if they exist
+    std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite-shm"),
         directories.output_dir.join("mock_da.sqlite-shm"),
-    ) {
-        if e.kind() != std::io::ErrorKind::NotFound {
-            anyhow::bail!(
-                "Failed to copy persistent_mock_da.sqlite-shm back to mock_da.sqlite-shm: {}",
-                e
-            );
-        }
-        tracing::trace!(
-            "No persistent_mock_da.sqlite-shm found: {}. Proceeding anyway.",
-            e
-        );
-    }
-    if let Err(e) = std::fs::copy(
+    )
+    .or_else(ignore_file_not_found)?;
+    std::fs::copy(
         directories.output_dir.join("persistent_mock_da.sqlite-wal"),
         directories.output_dir.join("mock_da.sqlite-wal"),
-    ) {
-        if e.kind() != std::io::ErrorKind::NotFound {
-            anyhow::bail!(
-                "Failed to copy persistent_mock_da.sqlite-wal back to mock_da.sqlite-wal: {}",
-                e
-            );
-        }
-        tracing::trace!("Failed to copy persistent_mock_da.sqlite-wal back to mock_da.sqlite-wal: {}. Proceeding anyway.", e);
-    }
+    )
+    .or_else(ignore_file_not_found)?;
+
     tracing::info!("Persistent mock data copied back to mock_da.sqlite");
     Ok(())
 }
@@ -91,16 +94,26 @@ async fn run_test() -> Result<(), anyhow::Error> {
     // Start the sequencer postgres and wait for it to be ready
     start_and_wait_for_postgres_ready(POSTGRES_CONTAINER_NAME, &password)?;
 
+    info!("Building rollup...");
+    if let Err(e) = build_rollup(directories.rollup_root.clone()) {
+        cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
+        anyhow::bail!(e);
+    }
+
     // Start the rollup. Run for 10 seconds
     info!(
         "Starting rollup from rollup workspace root: {}",
         directories.rollup_root.display()
     );
 
+    let stop_at_height = NUM_SOAK_BATCHES * 2 + 10;
+
     let rollup = Command::new("cargo")
         .args([
             "run",
             "--release",
+            "--features",
+            "acceptance-testing",
             "--",
             "--rollup-config-path",
             &directories
@@ -115,15 +128,15 @@ async fn run_test() -> Result<(), anyhow::Error> {
                 .display()
                 .to_string(),
             "--stop-at-rollup-height",
-            &((NUM_SOAK_BATCHES * 2).to_string()),
+            &(stop_at_height.to_string()),
         ])
         .current_dir(directories.rollup_root.clone())
         .env("RUST_LOG", "info")
         .spawn()
         .expect("Failed to start rollup");
 
-    // Wait a while, because this often requires compiling the entire rollup
-    for _ in 0..2400 {
+    // Wait up to a minute for the rollup to be ready
+    for _ in 0..600 {
         if reqwest::get(&format!("{}/ledger/slots/0", API_URL))
             .await
             .is_ok_and(|response| response.status().is_success())
@@ -183,8 +196,17 @@ async fn run_test() -> Result<(), anyhow::Error> {
         latest_batch_num
     );
 
-    let new_throughput_report =
-        run_soak(directories.clone(), rollup, latest_batch_num, false).await?;
+    // Wait for the sequencer to resync to the empty DA slots
+    wait_for_sequencer_ready().await?;
+
+    let new_throughput_report = run_soak(
+        directories.clone(),
+        rollup,
+        latest_batch_num,
+        stop_at_height,
+        false,
+    )
+    .await?;
     let previous_throughput_report: ThroughputReport = serde_json::from_str::<ThroughputReport>(
         &std::fs::read_to_string(directories.output_dir.join("throughput_report.json"))?,
     )?;

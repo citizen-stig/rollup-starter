@@ -53,7 +53,7 @@ async fn drain_slot_stream(
         }
     };
 
-    tracing::info!(
+    tracing::trace!(
         "State validation: got new slot notification, number = {}",
         latest_slot.number
     );
@@ -113,31 +113,30 @@ async fn query_rollup_height(client: &sov_api_spec::Client) -> reqwest::Result<u
     query_state_value::<u64>(&client, &rollup_height_url).await
 }
 
-async fn poll_for_api_state_update(
+async fn poll_for_visible_slot_update(
     client: &sov_api_spec::Client,
-    target_slot_number: u64,
-) -> anyhow::Result<()> {
-    let max_attempts = 300; // 300 * 10ms = 3s = one full slot at the default config
+    slot_number: u64,
+    last_visible_slot_number: u64,
+) -> anyhow::Result<u64> {
+    let max_attempts = 600; // 600 * 10ms = 6s = two full slots at the default config
     let mut attempt = 0;
 
     loop {
         let visible_slot = query_visible_slot(&client).await?;
 
         // Check if the API state has caught up to the slot notification
-        if visible_slot == target_slot_number {
+        if visible_slot > last_visible_slot_number {
             tracing::debug!(
-                "State consistency: waited {} ms for API state to be updated...",
+                "State consistency: waited {} ms for API state to be updated after receiving new slot...",
                 attempt * 10
             );
-            return Ok(());
+            return Ok(visible_slot);
         }
 
         attempt += 1;
         if attempt >= max_attempts {
             anyhow::bail!(
-                "State validation worker timed out waiting for API state to update. Slot notification: {}, API visible_slot: {}. This is either an error in the sequencer, or the acceptance test has a bug.",
-                target_slot_number,
-                visible_slot
+                "State validation worker timed out waiting for API state to update. Slot notification: {slot_number}, expected visible slot: {last_visible_slot_number}, API visible_slot: {visible_slot}. This is either an error in the sequencer, or the acceptance test has a bug."
             );
         }
 
@@ -224,7 +223,7 @@ fn is_too_late_error(
     };
 
     // Get the error string from the details map
-    let error_str = match api_error.details.get("error") {
+    let error_str = match api_error.details.get("message") {
         Some(serde_json::Value::String(s)) => s,
         _ => return false,
     };
@@ -257,6 +256,7 @@ fn extract_rollup_height_from_error(error_str: &str) -> Option<u64> {
 
 pub async fn state_validation_worker(
     client: sov_api_spec::Client,
+    rollup_stop_height: u64,
     rx: watch::Receiver<bool>,
 ) -> anyhow::Result<()> {
     // Subscribe to slots
@@ -266,29 +266,41 @@ pub async fn state_validation_worker(
 
     tracing::info!("State validation worker started");
 
+    let mut last_visible_slot = query_visible_slot(&client).await?;
     while !*rx.borrow() {
         let Some(latest_slot) = drain_slot_stream(&mut slot_stream).await? else {
             break; // Stream closed
         };
 
-        // There's a race condition between slot notification and checkpoint update, so poll until
-        // they match
-        poll_for_api_state_update(&client, latest_slot.number).await?;
-        let visible_slot = latest_slot.number;
+        if latest_slot.number >= rollup_stop_height {
+            // We're at, or very close to, the rollup shutting down. We can stop the state
+            // assertions now, and avoid having to handle failures due to the rollup no longer
+            // responding.
+            tracing::info!("State validation worker reached rollup_stop_height {rollup_stop_height}. Shutting down worker.");
+            break;
+        }
 
+        // There's a race condition between slot notification and API state update, so poll until
+        // the new visible slot is actually visible in the API
+        let visible_slot =
+            poll_for_visible_slot_update(&client, latest_slot.number, last_visible_slot).await?;
+
+        // Get the other two kernel values
         let (state_root_result, rollup_height_result) =
             tokio::join!(async { query_state_root(&client).await }, async {
                 query_rollup_height(&client).await
             });
         let state_root = state_root_result?;
         let rollup_height = rollup_height_result?;
+
+        // Now we can submit the assertion transaction
         tracing::debug!(
             "Visible_slot: {visible_slot}, rollup_height: {rollup_height}, state_root: {}",
             hex::encode(&state_root.root_hashes)
         );
-
-        // Now we can submit the assertion transaction
         send_assert_block_tx(&client, visible_slot, rollup_height, state_root.root_hashes).await?;
+
+        last_visible_slot = visible_slot;
     }
 
     tracing::info!("State validation worker shutting down");

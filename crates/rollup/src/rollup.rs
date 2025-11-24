@@ -150,7 +150,7 @@ impl FullNodeBlueprint<Native> for StarterRollup<Native> {
 
     async fn sequencer_additional_apis<Seq>(
         &self,
-        sequencer: Arc<Seq>,
+        sequencer: Seq,
         _rollup_config: &RollupConfig<<Self::Spec as Spec>::Address, Self::DaService>,
         shutdown_receiver: tokio::sync::watch::Receiver<()>,
     ) -> anyhow::Result<NodeEndpoints>
@@ -162,7 +162,6 @@ impl FullNodeBlueprint<Native> for StarterRollup<Native> {
                 max_log_limit: 20_000,
                 response_size_limit: (1024 * 1024) - (1024 * 30), // Limit our response size to 1MB, leaving 30kb for headers, overhead, and misestimation.
             },
-            buffer_raw_txs: true,
             shutdown_receiver,
         };
 
@@ -198,7 +197,7 @@ impl sov_modules_rollup_blueprint::WalletBlueprint<Native> for StarterRollup<Nat
 
 /// Handler for accepting EIP712 authenticated transactions
 async fn accept_eip712_tx<Seq>(
-    State(sequencer): State<Arc<Seq>>,
+    State(sequencer): State<Seq>,
     tx: Json<AcceptTx>,
 ) -> ApiResult<
     TxInfoWithConfirmation<DaBlobHash<<Seq::Da as DaServiceTrait>::Spec>, Seq::Confirmation>,
@@ -212,20 +211,12 @@ where
     let encoded_tx = Seq::Rt::encode_with_eip712_auth(raw_tx);
 
     // Submit to sequencer (similar to axum_accept_tx but with EIP712 auth)
-    let tx_with_hash = tokio::spawn(async move { sequencer.accept_tx(encoded_tx).await })
-        .await
-        .map_err(|e| {
-            tracing::error!(error = %e, "A panic occurred while accepting an EIP712 transaction");
-            sov_rest_utils::errors::internal_server_error_response_500(
-                "An internal error occurred while processing the transaction",
-            )
-        })?
-        .map_err(|e| {
-            if e.status.is_server_error() {
-                tracing::error!(error = ?e, "Error accepting EIP712 transaction");
-            }
-            IntoResponse::into_response(e)
-        })?;
+    let tx_with_hash = sequencer.accept_tx(encoded_tx).await.map_err(|e| {
+        if e.status.is_server_error() {
+            tracing::error!(error = ?e, "Error accepting EIP712 transaction");
+        }
+        IntoResponse::into_response(e)
+    })?;
 
     Ok(TxInfoWithConfirmation {
         id: tx_with_hash.tx_hash,

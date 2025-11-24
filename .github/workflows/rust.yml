@@ -82,18 +82,22 @@ jobs:
 
   docker-mock-da:
     name: "Docker Mock DA"
-    runs-on: ubuntu-latest
+    runs-on:
+      - nscloud-ubuntu-22.04-amd64-16x64-with-cache
+      - nscloud-cache-tag-rollup-starter-build
+      - nscloud-cache-size-100gb
+      # Privileged feature is needed for proper `io_uring` functionality needed by NOMT
+      - nscloud-exp-features:privileged;host-pid-namespace
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: make build-docker-mock-da
-
-      - name: Run Docker container in background
-        run: make run-docker-mock-da BACKGROUND=true
+      - name: Build Docker image and run it in the background
+        run: |
+          make build-docker-mock-da
+          make run-docker-mock-da BACKGROUND=true
 
       - name: Wait for rollup to be ready
         run: |
