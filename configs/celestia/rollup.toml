@@ -13,7 +13,7 @@ max_celestia_response_body_size = 104_857_600
 celestia_rpc_timeout_seconds = 30
 
 # The private key in hex format of Celestia wallet that has enough TIA to publish blobs.
-signer_private_key = ""
+signer_private_key = "aec34bb1cfae6e906594dc106af4057a9046f769e2eeed67d040f0107e15e167"
 
 
 [storage]
