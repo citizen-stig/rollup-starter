@@ -2,7 +2,7 @@
 # The address of the Celestia RPC server to interact with.
 
 rpc_url = "ws://127.0.0.1:26658"
-grpc_url = "http://127.0.0.1:9090"
+grpc_url = "http://127.0.0.1:9091"
 grpc_auth_token = "MY.SECRET.TOKEN"
 
 tx_priority = "High"
