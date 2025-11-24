@@ -6,9 +6,6 @@ url = "http://127.0.0.1:50051"
 # The path to the rollup's data directory. Paths that do not begin with `/` are interpreted as relative paths.
 path = "./rollup-state/rollup-starter-data-external"
 user_commit_concurrency = 6
-# This paramater introduces performance penalty and should be changed in production.
-# It allows avoiding allocating 256GB at the start
-user_preallocate_ht = false
 kernel_commit_concurrency = 2
 # Run pruning once every 100_000 blocks. Prune any keys more than 100 versions old
 pruner_block_interval = 100_000
@@ -19,6 +16,10 @@ state_cache_size = 4294967296
 # The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
 #user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
 user_hashtable_buckets = 1_000_000
+# This paramater introduces performance penalty and should be changed in production.
+# It allows avoiding allocating 256GB at the start
+user_preallocate_ht = false
+
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
 # any blocks before this height
