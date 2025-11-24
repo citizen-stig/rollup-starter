@@ -53,6 +53,9 @@ where
     #[cfg(feature = "native")]
     type GenesisInput = std::path::PathBuf;
 
+    #[cfg(feature = "native")]
+    type ModuleExecutionConfig = ();
+
     type Auth = EvmAndEip712Authenticator<S, Self, Self>;
 
     #[cfg(feature = "native")]
