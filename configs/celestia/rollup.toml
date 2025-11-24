@@ -21,9 +21,6 @@ signer_private_key = "aec34bb1cfae6e906594dc106af4057a9046f769e2eeed67d040f0107e
 path = "./rollup-state/rollup-starter-data-celestia"
 
 user_commit_concurrency = 6
-# The number of 4kb buckets to allocate for the state DB
-# The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
-user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
 # This paramater introduces performance penalty and should be changed in production.
 # It allows avoiding allocating 256GB at the start
 user_preallocate_ht = false
@@ -31,7 +28,12 @@ kernel_commit_concurrency = 2
 # Disable pruning for now
 # pruner_block_interval = 100_000
 pruner_versions_to_keep = 100
-state_cache_size = 10000000000 # 10GB
+#state_cache_size = 10000000000 # 10GB
+state_cache_size = 4294967296
+# The number of 4kb buckets to allocate for the state DB
+# The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
+# user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
+
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
 # any blocks before this height
