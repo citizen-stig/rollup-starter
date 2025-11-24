@@ -11,6 +11,7 @@ use sov_modules_api::Spec;
 use sov_modules_api::TxState;
 use sov_rollup_interface::da::DaSpec;
 
+use sov_modules_api::Context;
 pub use stf_starter_declaration::GenesisConfig;
 pub use stf_starter_declaration::Mailbox;
 use stf_starter_declaration::Runtime as RuntimeInner;
