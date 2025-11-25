@@ -42,6 +42,7 @@ async fn worker_task(
             worker_id,
             num_workers,
             ValidityProfile::Clean.get_validity(),
+            None,
         )
         .await;
 

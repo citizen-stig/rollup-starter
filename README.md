@@ -56,6 +56,10 @@ $ make clean-db
 $ cargo run
 ```
 
+```bash,test-ci
+$ sleep 12
+```
+
 ### Explore the REST API endpoints via Swagger UI
 
 The rollup includes several built-in modules: Bank (for token management), Paymaster, Hyperlane, and more. You can query any state item in these modules:

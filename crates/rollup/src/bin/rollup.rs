@@ -179,6 +179,7 @@ async fn new_rollup(
             prover_config,
             start_at_rollup_height,
             stop_at_rollup_height,
+            None,
         )
         .await
 }

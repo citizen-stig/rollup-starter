@@ -1,31 +1,44 @@
 [da]
-# External mock-da url.
-url = "http://127.0.0.1:50051"
+# The address of the Celestia RPC server to interact with.
+
+rpc_url = ""
+grpc_url = ""
+grpc_auth_token = "MY.SECRET.TOKEN"
+
+tx_priority = "High"
+
+# The largest response the rollup will accept from the Celestia node. Defaults to 100 MB
+max_celestia_response_body_size = 104_857_600
+# The maximum time to wait for a response to an RPC query against Celestia node. Defaults to 60 seconds.
+celestia_rpc_timeout_seconds = 30
+
+# The private key in hex format of Celestia wallet that has enough TIA to publish blobs.
+signer_private_key = ""
+
 
 [storage]
 # The path to the rollup's data directory. Paths that do not begin with `/` are interpreted as relative paths.
-path = "./rollup-state/rollup-starter-data-external"
+path = "./rollup-state/rollup-starter-data-celestia"
+
 user_commit_concurrency = 6
-kernel_commit_concurrency = 2
-# Run pruning once every 100_000 blocks. Prune any keys more than 100 versions old
-pruner_block_interval = 100_000
-pruner_versions_to_keep = 100
-#state_cache_size = 10000000000 # 10GB
-#state_cache_size = 4294967296
 # The number of 4kb buckets to allocate for the state DB
 # The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
-#user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
-user_hashtable_buckets = 1_000_000
+user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
 # This paramater introduces performance penalty and should be changed in production.
 # It allows avoiding allocating 256GB at the start
 user_preallocate_ht = false
-
+kernel_commit_concurrency = 2
+# Disable pruning for now
+# pruner_block_interval = 100_000
+pruner_versions_to_keep = 100
+state_cache_size = 10000000000 # 10GB
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
 # any blocks before this height
 [runner]
-genesis_height = 0
-da_polling_interval_ms = 200
+da_polling_interval_ms = 2_000
+concurrent_sync_tasks = 2
+pre_fetched_blocks_capacity = 10
 
 [runner.http_config]
 bind_host = "0.0.0.0"
@@ -55,7 +68,7 @@ max_number_of_transitions_in_memory = 20
 
 
 [sequencer]
-max_batch_size_bytes = 8388608 # 8 MiB
+max_batch_size_bytes = 2048576
 max_concurrent_blobs = 128
 max_allowed_node_distance_behind = 10
 rollup_address = "0xA6edfca3AA985Dd3CC728BFFB700933a986aC085"
@@ -67,7 +80,7 @@ disable_state_root_consistency_checks = true
 # "None" - Shutdown the sequencer instead of attempting recovery (default)
 # "TryToSave" - Attempt to recover by flushing batches and catching up with the chain
 recovery_strategy = "TryToSave"
-batch_execution_time_limit_millis = 6000 # This should be adjusted depending on the DA layer's block times
+batch_execution_time_limit_millis = 6000
 # If you have one available, uncomment the line below to use a postgres database for the sequencer's soft confirmations. This gives much better performance and durability.
 # postgres_connection_string="postgres://postgres:sequencerdb@localhost:5432/rollup" 
 ideal_lag_behind_finalized_slot = 1
@@ -75,7 +88,12 @@ ideal_lag_behind_finalized_slot = 1
 # This warms up caches so the main transaction executor can run with ready-to-use data.
 # This variable determines the number of worker threads.
 num_cache_warmup_workers = 0
-is_replica = false
+is_replica = true
+
+[sequencer.preferred.timing_oracle]
+priority_fee_percentage = 0
+max_fee = 100_000_000
+interval_millis = 50
 
 [sequencer.extension]
 max_log_limit = 20000

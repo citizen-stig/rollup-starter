@@ -84,6 +84,7 @@ pub async fn start_rollup(
             rollup_prover_config,
             None,
             None,
+            None,
         )
         .await
         .unwrap();

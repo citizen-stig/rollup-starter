@@ -21,14 +21,15 @@ block_time_ms = 3_000
 # The path to the rollup's data directory. Paths that do not begin with `/` are interpreted as relative paths.
 path = "{rollup_data_path}"
 user_commit_concurrency = 6
-# The number of 4kb buckets to allocate for the state DB
-# The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
-user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
 kernel_commit_concurrency = 2
 # Run pruning once every 1000 blocks. Prune any keys more than 100 versions old
 pruner_block_interval = 1000_000
 pruner_versions_to_keep = 100
 state_cache_size = 10000000000 # 10GB
+# The number of 4kb buckets to allocate for the state DB
+# The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
+user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
+
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
 # any blocks before this height
@@ -82,6 +83,6 @@ ideal_lag_behind_finalized_slot = 1
 # The sequencer optimistically pre-executes transactions across multiple worker threads.
 # This warms up caches so the main transaction executor can run with ready-to-use data.
 # This variable determines the number of worker threads.
-num_cache_warmup_workers = 5
+num_cache_warmup_workers = 0
 [sequencer.extension]
 max_log_limit = 20000
