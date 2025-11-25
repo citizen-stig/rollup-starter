@@ -28,9 +28,9 @@ pruner_versions_to_keep = 100
 # The state DB will not exceed this size, and you'll get a warning when it fills up to 90% capacity.
 #user_hashtable_buckets = 64_000_000 # 256 GB. You will need much more for production deployments
 # This paramater introduces performance penalty and should be changed in production.
-user_hashtable_buckets = 1_000_000
+user_hashtable_buckets = 16_000_000
 # It allows avoiding allocating 256GB at the start
-user_preallocate_ht = false
+user_preallocate_ht = true 
 
 # We define the rollup's genesis to occur at block number `start_height`. The rollup will ignore
 # any blocks before this height
@@ -44,7 +44,7 @@ bind_port = 12346
 public_address = "http://127.0.0.1:12346"
 
 [monitoring]
-telegraf_address = "127.0.0.1:8094"
+telegraf_address = "127.0.0.1:9094"
 # Defines how many measurements a rollup node will accumulate before sending it to the Telegraf.
 # It is expected from the rollup node to produce metrics all the time,
 # so measurements are buffered by size and not sent by time.
@@ -80,7 +80,7 @@ disable_state_root_consistency_checks = true
 recovery_strategy = "TryToSave"
 batch_execution_time_limit_millis = 6000 # This should be adjusted depending on the DA layer's block times
 # If you have one available, uncomment the line below to use a postgres database for the sequencer's soft confirmations. This gives much better performance and durability.
-# postgres_connection_string="postgres://postgres:sequencerdb@localhost:5432/rollup" 
+postgres_connection_string="postgres://postgres:sequencerdb@localhost:5432/rollup" 
 ideal_lag_behind_finalized_slot = 1
 # The sequencer optimistically pre-executes transactions across multiple worker threads.
 # This warms up caches so the main transaction executor can run with ready-to-use data.
