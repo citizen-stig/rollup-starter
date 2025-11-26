@@ -171,6 +171,15 @@ async fn new_rollup(
         })?;
 
     let rollup = StarterRollup::default();
+    let evm_pinned_cache_config = rollup_config_path
+        .parent()
+        .unwrap_or_else(|| {
+            panic!(
+                "Provided rollup config path {} does not have a parent directory",
+                rollup_config_path.display()
+            )
+        })
+        .join("evm_pinned_cache.json");
 
     rollup
         .create_new_rollup(
@@ -179,7 +188,7 @@ async fn new_rollup(
             prover_config,
             start_at_rollup_height,
             stop_at_rollup_height,
-            None,
+            Some(evm_pinned_cache_config),
         )
         .await
 }
