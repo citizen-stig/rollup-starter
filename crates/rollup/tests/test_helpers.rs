@@ -67,7 +67,7 @@ pub async fn start_rollup(
                 recovery_strategy: RecoveryStrategy::None,
                 minimum_profit_per_tx: 0,
                 events_channel_size: 10,
-                postgres_connection_string: None,
+                postgres_config: None,
                 disable_state_root_consistency_checks: false,
                 ..Default::default()
             }),
