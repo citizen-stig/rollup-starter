@@ -21,53 +21,53 @@ publish = false
 rust-version = "1.88"
 
 [workspace.dependencies]
-sov-address = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86", features = [
+sov-address = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c", features = [
   "evm",
 ] }
-sov-accounts = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-api-spec = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-attester-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-chain-state = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-bank = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-blob-storage = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-paymaster = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-capabilities = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-celestia-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-cli = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-db = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-hyperlane-integration = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86", features = [
+sov-accounts = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-api-spec = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-attester-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-chain-state = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-bank = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-blob-storage = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-paymaster = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-capabilities = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-celestia-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-cli = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-db = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-hyperlane-integration = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c", features = [
   "evm",
 ] }
-sov-test-state-consistency = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-kernels = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-ledger-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-mock-da = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-mock-zkvm = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-modules-api = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-modules-rollup-blueprint = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-modules-stf-blueprint = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-uniqueness = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-operator-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-prover-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-revenue-share = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-risc0-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-sp1-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-rollup-interface = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-sequencer = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-sequencer-registry = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-soak-testing-lib = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-state = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-stf-runner = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-test-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-rollup-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-universal-wallet = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-zkvm-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-build = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-ethereum = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-evm = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-soak-testing = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-eip712-auth = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
-sov-rest-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "994daacb0893177c0e47db34d364feab8b555d86" }
+sov-test-state-consistency = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-kernels = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-ledger-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-mock-da = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-mock-zkvm = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-modules-api = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-modules-rollup-blueprint = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-modules-stf-blueprint = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-uniqueness = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-operator-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-prover-incentives = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-revenue-share = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-risc0-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-sp1-adapter = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-rollup-interface = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-sequencer = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-sequencer-registry = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-soak-testing-lib = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-state = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-stf-runner = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-test-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-rollup-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-universal-wallet = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-zkvm-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-build = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-ethereum = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-evm = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-soak-testing = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-eip712-auth = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
+sov-rest-utils = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "ac8012db64db987da93e3824f553f8006d095d5c" }
 stf-starter = { path = "./crates/stf", default-features = false }
 stf-starter-declaration = { path = "./crates/stf/stf-declaration", default-features = false }
 value-setter = { path = "./examples/value-setter" }
