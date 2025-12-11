@@ -27,7 +27,7 @@ mod celestia {
 
     pub async fn new_da_service<S: Spec>(
         rollup_config: &RollupConfig<S::Address, DaService>,
-        _shutdown_receiver: Receiver<()>,
+        shutdown_receiver: Receiver<()>,
     ) -> DaService {
         DaService::new(
             rollup_config.da.clone(),
@@ -35,6 +35,7 @@ mod celestia {
                 rollup_batch_namespace: ROLLUP_BATCH_NAMESPACE,
                 rollup_proof_namespace: ROLLUP_PROOF_NAMESPACE,
             },
+            shutdown_receiver,
         )
         .await
     }
