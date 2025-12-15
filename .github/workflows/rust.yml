@@ -21,8 +21,11 @@ jobs:
     uses: ./.github/workflows/reusable-job.yml
     with:
       job-name: "Lint"
-      command: "make lint"
+      # Lints native project, but also compiles guests on bare metal.
+      # This to enforce update of Cargo.lock fo guests
+      command: "make lint && make check"
       setup-zepter: true
+      check-dirty-tree: true
     secrets: inherit
 
   test:
@@ -33,6 +36,7 @@ jobs:
       setup-sp1: true
       setup-risc0: true
       setup-nextest: true
+      check-dirty-tree: true
     secrets: inherit
 
   build-celestia-sp1:
@@ -42,6 +46,7 @@ jobs:
       env-vars: "SKIP_GUEST_BUILD=risc0"
       command: "cargo build --no-default-features --features celestia_da,sp1"
       setup-sp1: true
+      check-dirty-tree: true
     secrets: inherit
 
   build-celestia-risc0:
@@ -51,6 +56,7 @@ jobs:
       env-vars: "SKIP_GUEST_BUILD=sp1"
       command: "cargo build --no-default-features --features celestia_da,risc0"
       setup-risc0: true
+      check-dirty-tree: true
     secrets: inherit
 
   run-readme:
