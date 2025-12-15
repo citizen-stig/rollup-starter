@@ -33,6 +33,10 @@ on:
         required: false
         type: string
         default: "8x32"
+      check-dirty-tree:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   run:
@@ -98,3 +102,7 @@ jobs:
         env:
           SP1_PROVER: "mock"
         run: ${{ inputs.env-vars }} ${{ inputs.command }}
+
+      - name: Exit if working tree is dirty
+        if: ${{ inputs.check-dirty-tree }}
+        run: git diff --exit-code
