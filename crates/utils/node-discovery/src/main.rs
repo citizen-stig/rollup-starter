@@ -5,7 +5,7 @@
 use std::path::PathBuf;
 
 use clap::Parser;
-use sov_proxy_utils::NodeDiscovery;
+use sov_proxy_utils::ClusterInfoService;
 
 #[derive(Parser)]
 #[command(name = "node-discovery")]
@@ -24,7 +24,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("debug,sqlx=info"));
     tracing_subscriber::fmt().with_env_filter(filter).init();
@@ -34,18 +34,16 @@ async fn main() {
     tracing::info!("Starting node discovery.");
 
     let max_age = std::time::Duration::from_millis(args.max_age_millis);
-    let node_discovery = NodeDiscovery::connect(
+
+    let cluster_info_service = ClusterInfoService::spawn(
         &args.database_url,
         max_age,
         PathBuf::from(&args.output_file),
         None,
     )
-    .await
-    .expect("Failed to create NodeDiscovery");
+    .await?;
 
-    let task = node_discovery.spawn();
-    task.handle
-        .await
-        .unwrap_or_else(|e| panic!("Node discovery task panicked: {e:?}"))
-        .unwrap_or_else(|e| panic!("Failed to start node discovery loop: {e:?}"));
+    cluster_info_service.join().await?;
+
+    Ok(())
 }
