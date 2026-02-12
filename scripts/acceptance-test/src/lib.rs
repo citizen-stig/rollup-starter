@@ -1,3 +1,7 @@
+use evm_soak::{
+    evm_state_consistency_worker, load_state_consistency_contracts, pinned_worker_key,
+    unpinned_worker_key,
+};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rollup_starter::rollup::StarterRollup;
@@ -14,11 +18,14 @@ use tokio::task::JoinSet;
 use tracing::{debug, info};
 
 use crate::fetch_and_compare::{save_slot_snapshot, SlotFetcher};
+mod evm_contracts;
+pub mod evm_soak;
 pub mod fetch_and_compare;
 mod state_consistency;
 
 pub const POSTGRES_CONTAINER_NAME: &str = "postgres-acceptance-test";
-pub const API_URL: &str = "http://localhost:12348";
+pub const API_URL: &str = "http://127.0.0.1:12348";
+pub const API_ADDR: &str = "127.0.0.1:12348";
 pub const SETUP_THROUGHPUT_FILE: &str = "acceptance_throughput.json";
 
 // Save a full snapshot of the slot every N slots
@@ -367,6 +374,29 @@ pub async fn run_soak(
         rollup_stop_height,
         state_validator_rx,
     ));
+
+    let evm_contracts = load_state_consistency_contracts(&directories)?;
+    for (idx, address) in evm_contracts.pinned.into_iter().enumerate() {
+        let evm_worker_rx = tx.subscribe();
+        let worker_key = pinned_worker_key(idx)?;
+        worker_set.spawn(evm_state_consistency_worker(
+            address,
+            worker_key,
+            "pinned",
+            evm_worker_rx,
+        ));
+    }
+
+    for (idx, address) in evm_contracts.unpinned.into_iter().enumerate() {
+        let evm_worker_rx = tx.subscribe();
+        let worker_key = unpinned_worker_key(idx)?;
+        worker_set.spawn(evm_state_consistency_worker(
+            address,
+            worker_key,
+            "unpinned",
+            evm_worker_rx,
+        ));
+    }
 
     use tokio::signal::unix::SignalKind;
     let mut terminate = tokio::signal::unix::signal(SignalKind::terminate())

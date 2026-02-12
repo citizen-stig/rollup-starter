@@ -39,6 +39,7 @@ sov-db = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "5
 sov-hyperlane-integration = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "58d280a541b632a4c30931ec5abfbdea95dd6f8b", features = [
   "evm",
 ] }
+sov-eth-client = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "58d280a541b632a4c30931ec5abfbdea95dd6f8b" }
 sov-test-state-consistency = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "58d280a541b632a4c30931ec5abfbdea95dd6f8b" }
 sov-kernels = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "58d280a541b632a4c30931ec5abfbdea95dd6f8b" }
 sov-ledger-apis = { git = "https://github.com/Sovereign-Labs/sovereign-sdk.git", rev = "58d280a541b632a4c30931ec5abfbdea95dd6f8b" }
@@ -76,7 +77,11 @@ node-discovery = { path = "./crates/utils/node-discovery", default-features = fa
 value-setter = { path = "./examples/value-setter" }
 strum = { version = "0.26.3", features = ["derive"] }
 
+alloy = { version = "1.0.37", default-features = false, features = ["std", "essentials"] }
 alloy-consensus = { version = "1.0.37", default-features = false }
+alloy-primitives = { version = "1.4.0", default-features = false }
+alloy-rpc-types = { version = "1.0.37", default-features = false, features = ["eth"] }
+alloy-sol-types = { version = "1.4.0", default-features = false }
 axum = { version = "0.7.9", default-features = false }
 serde = { version = "1.0.192", features = ["derive", "rc"] }
 serde_json = { version = "1.0" }

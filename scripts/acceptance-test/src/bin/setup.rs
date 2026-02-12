@@ -1,5 +1,8 @@
 use std::process::Command;
 
+use acceptance_test::evm_soak::{
+    ensure_evm_pinned_cache_config, setup_state_consistency_contracts,
+};
 use acceptance_test::fetch_and_compare::{GetItemBehavior, SlotFetcher};
 use acceptance_test::{
     build_rollup, cleanup_postgres_container, generate_postgres_password, get_rollup_client,
@@ -110,6 +113,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let password = generate_postgres_password()?;
     start_and_wait_for_postgres_ready(POSTGRES_CONTAINER_NAME, &password)?;
     interpolate_config(&password, &directories)?;
+    ensure_evm_pinned_cache_config(&directories)?;
     info!("Building rollup...");
     if let Err(e) = build_rollup(directories.rollup_root.clone()) {
         cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
@@ -316,6 +320,22 @@ async fn do_manual_setup(directories: Directories) -> Result<(), anyhow::Error> 
                 second_non_empty_slot_number
             );
         }
+    }
+
+    let evm_contracts = setup_state_consistency_contracts(&directories).await?;
+    info!(
+        "Deployed {} pinned EVM state consistency contracts",
+        evm_contracts.pinned.len()
+    );
+    for (idx, address) in evm_contracts.pinned.iter().enumerate() {
+        info!("Pinned contract {idx}: {}", format!("{:#x}", address));
+    }
+    info!(
+        "Deployed {} unpinned EVM state consistency contracts",
+        evm_contracts.unpinned.len()
+    );
+    for (idx, address) in evm_contracts.unpinned.iter().enumerate() {
+        info!("Unpinned contract {idx}: {}", format!("{:#x}", address));
     }
     info!("Manual setup complete");
 
