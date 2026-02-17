@@ -296,9 +296,13 @@ pub fn build_rollup(root_dir: PathBuf) -> anyhow::Result<()> {
     }
 }
 
+fn is_very_close_to_soak_test_end(num_soak_batches: u64) -> bool {
+    num_soak_batches.saturating_add(15) > NUM_SOAK_BATCHES
+}
+
 /// Send SIGINT to the rollup process to gracefully shut it down.
 /// If the process doesn't respond within 10 seconds, send SIGKILL.
-fn kill_rollup(rollup_id: u32) {
+pub fn kill_rollup(rollup_id: u32) {
     tracing::info!("Sending SIGINT to rollup process {}", rollup_id);
 
     // Send SIGINT
@@ -437,7 +441,7 @@ pub async fn run_soak(
                             Err(e) => {
                                 // If we're very close to the end of the test, the rollup might have shut down before we could finish querying.
                                 // The test shouldn't fail for this reason, so we just skip the batch.
-                                if num_soak_batches + 15 > NUM_SOAK_BATCHES {
+                                if is_very_close_to_soak_test_end(num_soak_batches) {
                                     tracing::debug!("Soak slot fetcher encountered an error near the end of the test; num_soak_batches: {num_soak_batches}, NUM_SOAK_BATCHES: {NUM_SOAK_BATCHES}, slot number: {}, rollup_stop_height: {rollup_stop_height}", slot.number);
                                     tracing::warn!("Encountered an error very near the end of the test. Assuming the rollup shut down.");
                                     break;
@@ -510,9 +514,15 @@ pub async fn run_soak(
                         // Worker completed successfully, continue monitoring
                     }
                     Ok(Err(e)) => {
-                        tracing::error!("Worker task failed: {}", e);
-                        kill_rollup(rollup_id);
-                        return Err(e);
+                        if is_very_close_to_soak_test_end(num_soak_batches) {
+                            tracing::debug!("Worker task failed near the end of the test; num_soak_batches: {num_soak_batches}, NUM_SOAK_BATCHES: {NUM_SOAK_BATCHES}, rollup_stop_height: {rollup_stop_height}, err: {e}");
+                            tracing::warn!("Worker task failed very near the end of the test. Assuming the rollup shut down.");
+                            break;
+                        } else {
+                            tracing::error!("Worker task failed: {}", e);
+                            kill_rollup(rollup_id);
+                            return Err(e);
+                        }
                     }
                     Err(e) => {
                         tracing::error!("Worker task panicked: {}", e);
@@ -527,7 +537,21 @@ pub async fn run_soak(
     if tx.send(true).is_err() {
         debug!("Soak worker channel closed; workers already shut down");
     }
-    _ = worker_set.join_all();
+    let worker_errors: Vec<_> = worker_set
+        .join_all()
+        .await
+        .into_iter()
+        .filter_map(Result::err)
+        .collect();
+    if !worker_errors.is_empty() {
+        for (idx, err) in worker_errors.iter().enumerate() {
+            tracing::warn!(
+                "Ignoring worker task failure during shutdown ({}): {}",
+                idx + 1,
+                err
+            );
+        }
+    }
 
     // Wait for rollup to finish if it hasn't already
     if let Ok(rollup_result) = rollup_rx.try_recv() {
