@@ -1,10 +1,11 @@
 use acceptance_test::fetch_and_compare::SlotFetcher;
 use acceptance_test::{
-    cleanup_postgres_container, extend_last_stop_height,
+    extend_last_stop_height,
     fetch_and_compare::{compare_against_snapshot, load_snapshot_json},
     generate_postgres_password, get_rollup_client, prepare_acceptance_run_plan, run_soak,
-    spawn_rollup_manager, start_and_wait_for_postgres_ready, write_manager_config, Directories,
-    API_URL, BLOCKS_PER_VERSION, POSTGRES_CONTAINER_NAME,
+    run_until_shutdown_signal, shutdown_error, sleep_or_shutdown, spawn_rollup_manager,
+    wait_for_shutdown, write_manager_config, AcceptanceRunPlan, Directories,
+    PostgresContainerGuard, ShutdownReceiver, API_URL, BLOCKS_PER_VERSION, POSTGRES_CONTAINER_NAME,
 };
 use acceptance_test::{wait_for_sequencer_ready, ThroughputReport, SETUP_THROUGHPUT_FILE};
 use chrono::Utc;
@@ -15,6 +16,12 @@ use tracing::info;
 
 // After resync completes, continue running the rollup for this many blocks.
 const NUM_SOAK_BATCHES: u64 = BLOCKS_PER_VERSION;
+
+struct PreparedTestRun {
+    directories: Directories,
+    password: String,
+    plan: AcceptanceRunPlan,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -29,14 +36,14 @@ async fn main() -> Result<(), anyhow::Error> {
 
     info!("Starting acceptance test");
 
-    // Run the test
-    let result = run_test(args.binary_cache_dir).await;
+    let prepared = prepare_test_run(args.binary_cache_dir)?;
+    let result =
+        run_until_shutdown_signal(move |shutdown_rx| run_test(prepared, shutdown_rx)).await;
     if let Err(e) = &result {
         tracing::error!("Acceptance test failed: {}", e);
     } else {
         info!("Acceptance test completed");
     }
-    cleanup_postgres_container(POSTGRES_CONTAINER_NAME)?;
 
     result
 }
@@ -81,13 +88,29 @@ fn copy_persistent_mock_data(directories: &Directories) -> Result<(), anyhow::Er
     Ok(())
 }
 
-async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error> {
-    // Generate a config file with our db password and all paths set relative to the workspace root
+fn prepare_test_run(binary_cache_dir: Option<PathBuf>) -> Result<PreparedTestRun, anyhow::Error> {
     let password = generate_postgres_password()?;
     let mut directories = Directories::new()?;
     if let Some(binary_cache_dir) = binary_cache_dir {
         directories.set_rollup_build_cache_dir(binary_cache_dir)?;
     }
+    let plan = prepare_acceptance_run_plan(&directories, &password)?;
+    Ok(PreparedTestRun {
+        directories,
+        password,
+        plan,
+    })
+}
+
+async fn run_test(
+    prepared: PreparedTestRun,
+    mut shutdown_rx: ShutdownReceiver,
+) -> Result<(), anyhow::Error> {
+    let PreparedTestRun {
+        directories,
+        password,
+        plan,
+    } = prepared;
 
     tracing::info!(
         "Removing rollup data path: {}",
@@ -98,10 +121,8 @@ async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error
     // Copy the persistent mock data back to mock_da.sqlite. This way we don't grow our DA files with each run.
     copy_persistent_mock_data(&directories)?;
 
-    // Start the sequencer postgres and wait for it to be ready
-    start_and_wait_for_postgres_ready(POSTGRES_CONTAINER_NAME, &password)?;
-
-    let plan = prepare_acceptance_run_plan(&directories, &password)?;
+    // Start postgres and keep it alive for the test duration. Drop cleanup runs last.
+    let _postgres_guard = PostgresContainerGuard::start(POSTGRES_CONTAINER_NAME, &password)?;
     let expected_setup_batches = plan
         .manager_versions
         .last()
@@ -138,7 +159,7 @@ async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error
         {
             break;
         }
-        tokio::time::sleep(Duration::from_millis(500)).await;
+        sleep_or_shutdown(Duration::from_millis(500), &mut shutdown_rx).await?;
     }
 
     let mut slot_fetcher = SlotFetcher::new(get_rollup_client()?, &directories);
@@ -148,7 +169,10 @@ async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error
     let client = get_rollup_client()?;
     let mut latest_batch_num = 0;
     'outer: loop {
-        let slot = slot_fetcher.next_slot().await?.unwrap();
+        let slot = tokio::select! {
+            slot = slot_fetcher.next_slot() => slot?.unwrap(),
+            reason = wait_for_shutdown(&mut shutdown_rx) => return Err(shutdown_error(reason)),
+        };
         for slot_number in checked..=slot.number {
             let Ok(snapshot) = load_snapshot_json(slot_number, &directories.snapshots_dir) else {
                 // We might be missing a few slots at the beginning.
@@ -192,7 +216,7 @@ async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error
     );
 
     // Wait for the sequencer to resync to the empty DA slots
-    wait_for_sequencer_ready().await?;
+    wait_for_sequencer_ready(&mut shutdown_rx).await?;
 
     let resync_soak_config = plan
         .soak_config
@@ -201,13 +225,12 @@ async fn run_test(binary_cache_dir: Option<PathBuf>) -> Result<(), anyhow::Error
 
     let new_throughput_report = run_soak(
         directories.clone(),
-        rollup
-            .into_child()
-            .expect("Rollup process missing before soak"),
+        rollup,
         resync_soak_config,
         latest_batch_num,
         stop_at_height,
         false,
+        shutdown_rx.clone(),
     )
     .await?;
     let previous_throughput_report: ThroughputReport = serde_json::from_str::<ThroughputReport>(
